@@ -1,0 +1,12 @@
+--- mircpio-20080906.orig/extern.h
++++ mircpio-20080906/extern.h
+@@ -315,3 +315,9 @@
+     __attribute__((format (printf, 2, 3)));
+ void syswarn(int, int, const char *, ...)
+     __attribute__((format (printf, 3, 4)));
++
++/*
++ * strlfun.c
++ */
++size_t strlcat(char *, const char *, size_t);
++size_t strlcpy(char *, const char *, size_t);

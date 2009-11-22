@@ -1,0 +1,84 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+CC ?= gcc
+CFLAGS = -Wall -g
+
+ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+CPPFLAGS += -DLONG_OFF_T
+CPPFLAGS += -D'__RCSID(x)=' -D'__SCCSID(x)=' -D'__COPYRIGHT(x)='
+CFLAGS += -fno-strict-aliasing
+
+build: pax
+
+pax:
+	dh_testdir
+	rm -f pax
+	${CC} ${CPPFLAGS} ${CFLAGS} ${LDFLAGS} -o $@ \
+	    strlfun.c strmode.c fgetln.c \
+	    ar_io.c ar_subs.c buf_subs.c cache.c cpio.c file_subs.c ftree.c \
+	    gen_subs.c getoldopt.c options.c pat_rep.c pax.c sel_subs.c \
+	    tables.c tar.c tty_subs.c
+
+clean:
+	dh_testdir
+	-rm -f pax
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+#	dh_installexamples
+	dh_install
+	cd debian/mircpio/usr/bin && mv pax mirpax && \
+	    ln mirpax mircpio && ln mirpax mirtar
+#	dh_installmenu
+#	dh_installdebconf
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime
+#	dh_installinit
+#	dh_installcron
+#	dh_installinfo
+	dh_installman
+	cd debian/mircpio/usr/share/man/man1 && mv pax.1 mirpax.1 && \
+	    mv cpio.1 mircpio.1 && mv tar.1 mirtar.1
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+#	dh_perl
+#	dh_python
+#	dh_makeshlibs
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install check

@@ -1,0 +1,6 @@
+mircpio (20080906-1) experimental; urgency=low
+
+  * Initial release. (Closes: #9999999999 just so that lintian is happy)
+  * Adjust manpages to cope with GNU groff’s inferiorities
+
+ -- Thorsten Glaser <tg@freewrt.org>  Sun, 07 Sep 2008 01:00:10 +0000

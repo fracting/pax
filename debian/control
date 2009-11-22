@@ -1,0 +1,13 @@
+Source: mircpio
+Section: devel
+Priority: optional
+Maintainer: Thorsten Glaser <tg@freewrt.org>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.8.0
+
+Package: mircpio
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: portable version of MirBSD paxtar (cpio, pax, tar)
+ mircpio packages the MirBSD cpio(1) = pax(1) = tar(1) command,
+ also known as paxtar.
