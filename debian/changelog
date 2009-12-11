@@ -1,6 +1,24 @@
+mircpio (20091122-1) experimental; urgency=low
+
+  * New upstream release
+    - build from formal release, not CVS export
+    - restructure build/patch system similar to the mksh package
+  * Link against libbsd instead of duplicating code
+  * Patch manpages to honour the binary præfix (pax→mirpax, etc.)
+  * Move to debhelper 5, Policy 3.8.3 (no relevant changes)
+  * Add RCS IDs almost everywhere
+  * Add DMUA, VCS-* headers, misc:Depends
+  * Enhance package description
+  * XXX missing
+    - b-d auf mircpio|cpio|pax (auch mksh, etc.)
+    - versionierte b-d auf noch nicht hochgeladener libbsd (__SCCSID)
+    - copyright fill-in
+
+ -- Thorsten Glaser <tg@mirbsd.de>  Fri, 11 Dec 2009 12:22:34 +0100
+
 mircpio (20080906-1) experimental; urgency=low
 
-  * Initial release. (Closes: #9999999999 just so that lintian is happy)
+  * Initial release
   * Adjust manpages to cope with GNU groff’s inferiorities
 
  -- Thorsten Glaser <tg@freewrt.org>  Sun, 07 Sep 2008 01:00:10 +0000

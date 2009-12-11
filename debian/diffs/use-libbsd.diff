@@ -1,0 +1,11 @@
+$MirOS: pax/debian/diffs/use-libbsd.diff,v 1.1 2009/12/11 11:27:05 tg Exp $
+--- extern.h~	2009-10-04 16:51:30.000000000 +0200
++++ extern.h	2009-12-09 18:08:00.000000000 +0100
+@@ -45,6 +45,7 @@
+ #if defined(__GLIBC__)
+ #include <time.h>
+ #endif
++#include <bsd/bsd.h>
+ 
+ #if !defined(__INTERIX) && !defined(__APPLE__)
+ #define HAS_TAPE	1

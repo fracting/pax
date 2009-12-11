@@ -1,11 +1,14 @@
 This package was debianised by Thorsten Glaser <tg@mirbsd.de> on
 Sat, 06 Sep 2008 21:25:34 +0000.
 
+$MirOS: pax/debian/copyright,v 1.2 2009/12/11 11:27:03 tg Exp $
+
 It was downloaded from:
-:ext:anoncvs@anoncvs.mirbsd.org:/cvs src/bin/pax on 2008-09-06
+https://www.mirbsd.org/MirOS/dist/mir/cpio/paxmirabilis-20091122.cpio.gz
 
 XXX fill the actual licences in
 
-This package is Copyright (c) 2008 by The MirOS Project and its contri-
-butors and covered by a plethora of BSD-style licences. Adaption for a
+This package is Copyright © 2008, 2009
+	The MirOS Project and its contributors
+and covered by a plethora of BSD-style licences. Adaption for a
 simple GNU/Linux integration has been done for the FreeWRT Project.

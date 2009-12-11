@@ -1,4 +1,6 @@
 #!/usr/bin/make -f
+# $MirOS: pax/debian/rules,v 1.2 2009/12/11 11:27:03 tg Exp $
+#-
 # -*- makefile -*-
 # Sample debian/rules that uses debhelper.
 # This file was originally written by Joey Hess and Craig Small.
@@ -6,33 +8,58 @@
 # dh-make output file, you may use that output file without restriction.
 # This special exception was added by Craig Small in version 0.37 of dh-make.
 
-CC ?= gcc
-CFLAGS = -Wall -g
+DISTFILE=		paxmirabilis-20091122.cpio.gz
+
+
+CC?=			gcc
+CFLAGS=			-Wall -g
 
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
+CFLAGS+=		-O0
 else
-	CFLAGS += -O2
+CFLAGS+=		-O2
 endif
 
-CPPFLAGS += -DLONG_OFF_T
-CPPFLAGS += -D'__RCSID(x)=' -D'__SCCSID(x)=' -D'__COPYRIGHT(x)='
-CFLAGS += -fno-strict-aliasing
+CPPFLAGS+=		-DLONG_OFF_T
+#CPPFLAGS += -D'__RCSID(x)=' -D'__SCCSID(x)=' -D'__COPYRIGHT(x)='
+CFLAGS+=		-fno-strict-aliasing
+LDADD+=			-lbsd
 
-build: pax
+patch: debian/.patch_stamp
+build: debian/.build_stamp
 
-pax:
+debian/.patch_stamp: ${DISTFILE}
 	dh_testdir
-	rm -f pax
-	${CC} ${CPPFLAGS} ${CFLAGS} ${LDFLAGS} -o $@ \
-	    strlfun.c strmode.c fgetln.c \
+	-rm -f debian/.*_stamp mirpax
+	-rm -rf pax
+	# extract mircpio upstream source code
+	gzip -dc ${DISTFILE} | if which mirpax >/dev/null 2>&1; then \
+		mirpax -r; \
+	elif which pax >/dev/null 2>&1; then \
+		pax -r; \
+	else \
+		cpio -mid; \
+	fi
+	# apply patches
+	for a in debian/diffs/*; do \
+		test -e "$$a" || continue; \
+		(cd pax; patch -lp0) <$$a; \
+	done
+	touch $@
+
+debian/.build_stamp: debian/.patch_stamp
+	dh_testdir
+	rm -f mirpax
+	cd pax && ${CC} ${CPPFLAGS} ${CFLAGS} ${LDFLAGS} -o ../mirpax \
 	    ar_io.c ar_subs.c buf_subs.c cache.c cpio.c file_subs.c ftree.c \
 	    gen_subs.c getoldopt.c options.c pat_rep.c pax.c sel_subs.c \
-	    tables.c tar.c tty_subs.c
+	    tables.c tar.c tty_subs.c ${LDADD}
+	touch $@
 
 clean:
 	dh_testdir
-	-rm -f pax
+	-rm -f debian/.*_stamp mirpax
+	-rm -rf pax
 	dh_clean
 
 install: build
@@ -53,7 +80,7 @@ binary-arch: build install
 	dh_installdocs
 #	dh_installexamples
 	dh_install
-	cd debian/mircpio/usr/bin && mv pax mirpax && \
+	cd debian/mircpio/usr/bin && \
 	    ln mirpax mircpio && ln mirpax mirtar
 #	dh_installmenu
 #	dh_installdebconf
@@ -65,8 +92,9 @@ binary-arch: build install
 #	dh_installcron
 #	dh_installinfo
 	dh_installman
-	cd debian/mircpio/usr/share/man/man1 && mv pax.1 mirpax.1 && \
-	    mv cpio.1 mircpio.1 && mv tar.1 mirtar.1
+	cd debian/mircpio/usr/share/man/man1 && for i in pax cpio tar; do \
+		mv $$i.1 mir$$i.1; \
+	done
 	dh_link
 	dh_strip
 	dh_compress
