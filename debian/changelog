@@ -5,7 +5,7 @@ mircpio (20091122-1) experimental; urgency=low
     - restructure build/patch system similar to the mksh package
   * Link against libbsd instead of duplicating code
   * Patch manpages to honour the binary præfix (pax→mirpax, etc.)
-  * Move to debhelper 5, Policy 3.8.3 (no relevant changes)
+  * Move to debhelper 5, Policy 3.8.4 (no relevant changes)
   * Add RCS IDs almost everywhere
   * Add DMUA, VCS-* headers, misc:Depends
   * Enhance package description
@@ -14,7 +14,7 @@ mircpio (20091122-1) experimental; urgency=low
     - versionierte b-d auf noch nicht hochgeladener libbsd (__SCCSID)
     - copyright fill-in
 
- -- Thorsten Glaser <tg@mirbsd.de>  Fri, 11 Dec 2009 12:22:34 +0100
+ -- Thorsten Glaser <tg@mirbsd.de>  Fri, 11 Dec 2009 12:22:34 +0101
 
 mircpio (20080906-1) experimental; urgency=low
 
