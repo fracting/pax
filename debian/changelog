@@ -11,12 +11,13 @@ mircpio (20091122-1) experimental; urgency=low
   * Enhance package description
   * debian/source/format: Enforce "1.0" manually, for now
   * debian/control: Remove DMUA, I'm a DD now
+  * paxmirabilis can do Multi-Arch: foreign as requested by vorlon
   * XXX missing
     - b-d auf mircpio|cpio|pax (auch mksh, etc.)
     - versionierte b-d auf noch nicht hochgeladener libbsd (__SCCSID)
     - copyright fill-in
 
- -- Thorsten Glaser <tg@mirbsd.de>  Fri, 11 Dec 2009 12:22:34 +0103
+ -- Thorsten Glaser <tg@mirbsd.de>  Fri, 11 Dec 2009 12:22:34 +0104
 
 mircpio (20080906-1) experimental; urgency=low
 

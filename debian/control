@@ -1,4 +1,4 @@
-# $MirOS: pax/debian/control,v 1.4 2010/02/25 22:15:35 tg Exp $
+# $MirOS: pax/debian/control,v 1.5 2011/02/27 21:50:17 tg Exp $
 #
 Source: mircpio
 Section: devel
@@ -13,6 +13,7 @@ Vcs-Browser: http://cvs.mirbsd.de/contrib/hosted/tg/deb/mircpio/
 
 Package: mircpio
 Architecture: any
+Multi-Arch: foreign
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: portable version of MirBSD paxtar (cpio, pax, tar)
  mircpio packages the MirBSD cpio(1) = pax(1) = tar(1) command,
