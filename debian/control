@@ -1,10 +1,12 @@
-# $MirOS: pax/debian/control,v 1.5 2011/02/27 21:50:17 tg Exp $
+# $MirOS: pax/debian/control,v 1.6 2011/03/04 15:06:01 tg Exp $
 #
 Source: mircpio
+Origin: WTF
+Bugs: mailto:wtf@mirbsd.org
 Section: devel
 Priority: optional
 Maintainer: Thorsten Glaser <tg@mirbsd.de>
-Build-Depends: cpio | pax, debhelper (>= 5), libbsd-dev (>= 0.1.4)
+Build-Depends: mircpio | pax | cpio, debhelper (>= 5), libbsd-dev (>= 0.1.4)
 Standards-Version: 3.8.4
 # First word is the $CVSROOT (-d arg) string, second word the module.
 # Upstream is on the same server, in the "mksh" module.
