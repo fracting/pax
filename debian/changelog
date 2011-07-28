@@ -1,4 +1,4 @@
-mircpio (20091122-1) experimental; urgency=low
+mircpio (20091122-1) xexperimental; urgency=low
 
   * New upstream release
     - build from formal release, not CVS export
@@ -16,8 +16,9 @@ mircpio (20091122-1) experimental; urgency=low
   * XXX missing
     - versionierte b-d auf noch nicht hochgeladener libbsd (__SCCSID)
     - copyright fill-in
+  * Update packaging style
 
- -- Thorsten Glaser <tg@mirbsd.de>  Fri, 11 Dec 2009 12:22:34 +0105
+ -- Thorsten Glaser <tg@mirbsd.de>  Thu, 28 Jul 2011 17:15:10 +0000
 
 mircpio (20080906-1) experimental; urgency=low
 
