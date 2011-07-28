@@ -2,7 +2,7 @@
 /*	$NetBSD: options.c,v 1.6 1996/03/26 23:54:18 mrg Exp $	*/
 
 /*-
- * Copyright (c) 2005, 2006, 2007 Thorsten Glaser <tg@66h.42h.de>
+ * Copyright (c) 2005, 2006, 2007 Thorsten Glaser <tg@mirbsd.org>
  * Copyright (c) 1992 Keith Muller.
  * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -38,9 +38,6 @@
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/stat.h>
-#ifndef __INTERIX
-#include <sys/mtio.h>
-#endif
 #include <stdio.h>
 #include <string.h>
 #include <err.h>
@@ -55,8 +52,12 @@
 #include "tar.h"
 #include "extern.h"
 
+#if HAS_TAPE
+#include <sys/mtio.h>
+#endif
+
 __SCCSID("@(#)options.c	8.2 (Berkeley) 4/18/94");
-__RCSID("$MirOS: src/bin/pax/options.c,v 1.26 2008/08/07 19:40:39 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/options.c,v 1.31 2009/10/27 18:47:26 tg Exp $");
 
 #ifdef __GLIBC__
 char *fgetln(FILE *, size_t *);
@@ -74,7 +75,7 @@ static int no_op(void);
 static void printflg(unsigned int);
 static int c_frmt(const void *, const void *);
 static off_t str_offt(char *);
-static char *getline(FILE *fp);
+static char *get_line(FILE *fp);
 static void pax_options(int, char **);
 static void pax_usage(void) __attribute__((noreturn));
 static void tar_set_action(int);
@@ -87,10 +88,10 @@ int mkpath(char *);
 
 static void process_M(const char *, void (*)(void));
 
-/* errors from getline */
-#define GETLINE_FILE_CORRUPT 1
-#define GETLINE_OUT_OF_MEM 2
-static int getline_error;
+/* errors from get_line */
+#define GET_LINE_FILE_CORRUPT 1
+#define GET_LINE_OUT_OF_MEM 2
+static int get_line_error;
 
 
 #define GZIP_CMD	"gzip"		/* command to run as gzip */
@@ -380,7 +381,7 @@ pax_options(int argc, char **argv)
 			/*
 			 * verbose operation mode
 			 */
-			vflag = 1;
+			vflag++;
 			flg |= VF;
 			break;
 		case 'w':
@@ -924,14 +925,14 @@ tar_options(int argc, char **argv)
 						paxwarn(1, "Unable to open file '%s' for read", file);
 						tar_usage();
 					}
-					while ((str = getline(fp)) != NULL) {
+					while ((str = get_line(fp)) != NULL) {
 						if (pat_add(str, dir) < 0)
 							tar_usage();
 						sawpat = 1;
 					}
 					if (strcmp(file, "-") != 0)
 						fclose(fp);
-					if (getline_error) {
+					if (get_line_error) {
 						paxwarn(1, "Problem with file '%s'", file);
 						tar_usage();
 					}
@@ -1021,13 +1022,13 @@ tar_options(int argc, char **argv)
 					paxwarn(1, "Unable to open file '%s' for read", file);
 					tar_usage();
 				}
-				while ((str = getline(fp)) != NULL) {
+				while ((str = get_line(fp)) != NULL) {
 					if (ftree_add(str, 0) < 0)
 						tar_usage();
 				}
 				if (strcmp(file, "-") != 0)
 					fclose(fp);
-				if (getline_error) {
+				if (get_line_error) {
 					paxwarn(1, "Problem with file '%s'",
 					    file);
 					tar_usage();
@@ -1218,7 +1219,7 @@ cpio_options(int argc, char **argv)
 				/*
 				 * verbose operation mode
 				 */
-				vflag = 1;
+				vflag++;
 				break;
 			case 'z':
 				/*
@@ -1252,11 +1253,11 @@ cpio_options(int argc, char **argv)
 					paxwarn(1, "Unable to open file '%s' for read", optarg);
 					cpio_usage();
 				}
-				while ((str = getline(fp)) != NULL) {
+				while ((str = get_line(fp)) != NULL) {
 					pat_add(str, NULL);
 				}
 				fclose(fp);
-				if (getline_error) {
+				if (get_line_error) {
 					paxwarn(1, "Problem with file '%s'", optarg);
 					cpio_usage();
 				}
@@ -1364,10 +1365,10 @@ cpio_options(int argc, char **argv)
 			 * no read errors allowed on updates/append operation!
 			 */
 			maxflt = 0;
-			while ((str = getline(stdin)) != NULL) {
+			while ((str = get_line(stdin)) != NULL) {
 				ftree_add(str, 0);
 			}
-			if (getline_error) {
+			if (get_line_error) {
 				paxwarn(1, "Problem while reading stdin");
 				cpio_usage();
 			}
@@ -1593,21 +1594,21 @@ str_offt(char *val)
 }
 
 char *
-getline(FILE *f)
+get_line(FILE *f)
 {
 	char *name, *temp;
 	size_t len;
 
 	name = fgetln(f, &len);
 	if (!name) {
-		getline_error = ferror(f) ? GETLINE_FILE_CORRUPT : 0;
+		get_line_error = ferror(f) ? GET_LINE_FILE_CORRUPT : 0;
 		return(0);
 	}
 	if (name[len-1] != '\n')
 		len++;
 	temp = malloc(len);
 	if (!temp) {
-		getline_error = GETLINE_OUT_OF_MEM;
+		get_line_error = GET_LINE_OUT_OF_MEM;
 		return(0);
 	}
 	memcpy(temp, name, len-1);
@@ -1747,6 +1748,8 @@ process_M(const char *arg, void (*call_usage)(void))
 		k = ANON_VERBOSE;
 	} else if (!strncmp(arg, "debug", 5)) {
 		k = ANON_DEBUG;
+	} else if (!strncmp(arg, "lncp", 4)) {
+		k = ANON_LNCP;
 	} else
 		call_usage();
 	if (j)
