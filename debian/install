@@ -1,1 +1,3 @@
-pax usr/bin
+# $MirOS: pax/debian/install,v 1.2 2011/08/16 14:37:45 tg Exp $
+#-
+mirpax usr/bin

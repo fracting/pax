@@ -1,2 +1,4 @@
+# $MirOS: pax/debian/watch,v 1.2 2011/08/16 14:37:46 tg Exp $
+
 version=3
 http://www.mirbsd.org/MirOS/dist/mir/cpio/ paxmirabilis-(.*)\.cpio\.gz

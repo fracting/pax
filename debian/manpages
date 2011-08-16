@@ -1,3 +1,5 @@
-cpio.1
-pax.1
-tar.1
+# $MirOS: pax/debian/manpages,v 1.2 2011/08/16 14:37:45 tg Exp $
+#-
+mircpio.1
+mirpax.1
+mirtar.1
