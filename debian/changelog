@@ -1,8 +1,8 @@
-mircpio (20110817-0wtf1) wtf; urgency=low
+mircpio (20110817-0wtf2) wtf; urgency=low
 
   * New upstream release, many new features
     - build from formal release, not CVS export
-  * Update packaging to current standards
+  * Update packaging to current standards, still works with etch
   * Link against libbsd instead of duplicating code
   * Move to Policy 3.9.2 (no relevant changes)
   * Add RCS IDs, VCS-* headers, misc:Depends
@@ -11,7 +11,7 @@ mircpio (20110817-0wtf1) wtf; urgency=low
   * paxmirabilis can do Multi-Arch: foreign as requested by vorlon
   * Add Origin and Bugs headers
 
- -- Thorsten Glaser <tg@mirbsd.de>  Wed, 17 Aug 2011 09:48:39 +0000
+ -- Thorsten Glaser <tg@mirbsd.de>  Wed, 17 Aug 2011 10:55:08 +0000
 
 mircpio (20080906-1) experimental; urgency=low
 
