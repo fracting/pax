@@ -1,4 +1,4 @@
-# $MirOS: pax/debian/control,v 1.10 2011/08/17 08:19:31 tg Exp $
+# $MirOS: pax/debian/control,v 1.11 2011/08/17 09:48:46 tg Exp $
 #
 Source: mircpio
 Origin: WTF
@@ -6,7 +6,7 @@ Bugs: mailto:wtf@mirbsd.org
 Section: devel
 Priority: optional
 Maintainer: Thorsten Glaser <tg@mirbsd.de>
-Build-Depends: debhelper (>= 5), libbsd-dev
+Build-Depends: debhelper (>= 5), libbsd-dev (>= 0.1.1)
 Standards-Version: 3.9.2
 # First word is the $CVSROOT (-d arg) string, second word the module.
 Vcs-CVS: :ext:_anoncvs@anoncvs.mirbsd.org:/cvs contrib/hosted/tg/deb/mircpio

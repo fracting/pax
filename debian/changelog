@@ -11,7 +11,7 @@ mircpio (20110817-0wtf1) wtf; urgency=low
   * paxmirabilis can do Multi-Arch: foreign as requested by vorlon
   * Add Origin and Bugs headers
 
- -- Thorsten Glaser <tg@mirbsd.de>  Wed, 17 Aug 2011 09:22:40 +0000
+ -- Thorsten Glaser <tg@mirbsd.de>  Wed, 17 Aug 2011 09:48:39 +0000
 
 mircpio (20080906-1) experimental; urgency=low
 
