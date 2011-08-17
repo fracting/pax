@@ -1,4 +1,4 @@
-# $MirOS: pax/debian/control,v 1.9 2011/08/16 21:50:00 tg Exp $
+# $MirOS: pax/debian/control,v 1.10 2011/08/17 08:19:31 tg Exp $
 #
 Source: mircpio
 Origin: WTF
@@ -6,8 +6,8 @@ Bugs: mailto:wtf@mirbsd.org
 Section: devel
 Priority: optional
 Maintainer: Thorsten Glaser <tg@mirbsd.de>
-Build-Depends: debhelper (>= 5), libbsd-dev (>= 0.1.4)
-Standards-Version: 3.8.4
+Build-Depends: debhelper (>= 5), libbsd-dev
+Standards-Version: 3.9.2
 # First word is the $CVSROOT (-d arg) string, second word the module.
 Vcs-CVS: :ext:_anoncvs@anoncvs.mirbsd.org:/cvs contrib/hosted/tg/deb/mircpio
 Vcs-Browser: http://cvs.mirbsd.de/contrib/hosted/tg/deb/mircpio/
@@ -24,4 +24,5 @@ Description: portable version of MirBSD paxtar (cpio, pax, tar)
  as pax yet. It has extensions for removing non-numerical user
  and group IDs from the archive, storing hardlinked files only
  once, setting ownership to the superuser, anonymising inode
- and device information, and changing the mtime to zero.
+ and device information, and changing the mtime to zero. Its
+ "ar" format is suitable for operating on *.deb files.

@@ -1,18 +1,17 @@
-mircpio (20110816-0exp1) experimental; urgency=low
+mircpio (20110817-0exp1) experimental; urgency=low
 
-  * New upstream release
+  * New upstream release, many new features
     - build from formal release, not CVS export
     - update packaging to current standards
   * Link against libbsd instead of duplicating code
   * Patch manpages to honour the binary præfix (pax→mirpax, etc.)
-  * Move to debhelper 5, Policy 3.8.4 (no relevant changes)
+  * Move to debhelper 5, Policy 3.9.2 (no relevant changes)
   * Add RCS IDs almost everywhere, VCS-* headers, misc:Depends
-  * Enhance package description
-  * debian/source/format: Enforce "1.0" manually, for now
+  * Enhance package description, mention distinguishing features
   * paxmirabilis can do Multi-Arch: foreign as requested by vorlon
   * Add Origin and Bugs headers
 
- -- Thorsten Glaser <tg@mirbsd.de>  Tue, 16 Aug 2011 14:20:16 +0000
+ -- Thorsten Glaser <tg@mirbsd.de>  Wed, 17 Aug 2011 08:15:17 +0000
 
 mircpio (20080906-1) experimental; urgency=low
 
