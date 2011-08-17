@@ -3,7 +3,7 @@ mircpio (20110817-0wtf2) wtf; urgency=low
   * New upstream release, many new features
     - build from formal release, not CVS export
   * Update packaging to current standards, still works with etch
-  * Link against libbsd instead of duplicating code
+  * Link against libbsd (backport) instead of duplicating code
   * Move to Policy 3.9.2 (no relevant changes)
   * Add RCS IDs, VCS-* headers, misc:Depends
   * Patch manpages to honour the binary præfix (pax→mirpax, etc.)
