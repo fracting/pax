@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# $MirOS: pax/debian/rules,v 1.4 2011/08/16 14:37:45 tg Exp $
+# $MirOS: pax/debian/rules,v 1.5 2011/08/17 08:55:29 tg Exp $
 
 CC?=			gcc
 CFLAGS=			-Wall -g
@@ -22,10 +22,11 @@ debian/.build_stamp:
 	dh_testdir
 	-rm -f debian/.*_stamp mir*.1 mirpax
 	+for opts in '-flto=jobserver' '-fwhole-program --combine' ''; do \
+		set -x; \
 		${CC} ${CPPFLAGS} ${CFLAGS} $$opts ${LDFLAGS} -o mirpax \
 		    ar_io.c ar_subs.c buf_subs.c cache.c cpio.c file_subs.c \
 		    ftree.c gen_subs.c getoldopt.c options.c pat_rep.c pax.c \
-		    sel_subs.c tables.c tar.c tty_subs.c ${LDADD}; \
+		    sel_subs.c tables.c tar.c tty_subs.c ar.c ${LDADD}; \
 		test -x mirpax && exit 0; \
 	done; echo >&2 Compiling failed.; exit 1
 	for prog in cpio pax tar; do \
