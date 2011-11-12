@@ -1,3 +1,9 @@
+mircpio (20110817-0wtf3) xwtf; urgency=low
+
+  * debian/rules: cleanup (remove dh_installdirs, add back dh_clean)
+
+ -- Thorsten Glaser <tg@mirbsd.de>  Sat, 12 Nov 2011 00:08:05 +0000
+
 mircpio (20110817-0wtf2) wtf; urgency=low
 
   * New upstream release, many new features

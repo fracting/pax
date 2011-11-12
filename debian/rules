@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# $MirOS: pax/debian/rules,v 1.5 2011/08/17 08:55:29 tg Exp $
+# $MirOS: pax/debian/rules,v 1.6 2011/11/12 00:11:29 tg Exp $
 
 CC?=			gcc
 CFLAGS=			-Wall -g
@@ -44,7 +44,7 @@ binary-indep: build-indep
 binary-arch: build-arch
 	dh_testdir
 	dh_testroot
-	dh_installdirs
+	dh_clean -k
 	dh_installchangelogs
 	dh_installdocs
 	dh_install
