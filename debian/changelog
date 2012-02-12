@@ -1,9 +1,13 @@
-mircpio (20110817-0wtf3) xwtf; urgency=low
+pax (1:20120211-1) unstable; urgency=low
 
+  * Take over maintainership of the pax package in Debian from
+    Bdale Garbee (thanks) and replace it with the MirBSD variant
+    also providing paxcpio/paxtar (Closes: #42158) (Closes: #539353)
   * debian/rules: cleanup (remove dh_installdirs, add back dh_clean)
   * debian/rules: modernise; use fully hardened dpkg-buildflags
+  * debian/control: rework package description
 
- -- Thorsten Glaser <tg@mirbsd.de>  Sat, 12 Nov 2011 00:08:05 +0000
+ -- Thorsten Glaser <tg@mirbsd.de>  Sun, 12 Feb 2012 02:10:40 +0000
 
 mircpio (20110817-0wtf2) wtf; urgency=low
 

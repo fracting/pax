@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# $MirOS: pax/debian/rules,v 1.7 2012/02/12 01:14:26 tg Exp $
+# $MirOS: pax/debian/rules,v 1.8 2012/02/12 02:23:51 tg Exp $
 
 CC?=			gcc
 EXTRA_CFLAGS=		-Wall -Wextra -Wformat -fno-strict-aliasing
@@ -25,23 +25,23 @@ build-indep:
 
 debian/.build_stamp:
 	dh_testdir
-	-rm -f debian/.*_stamp mir*.1 mirpax
+	-rm -f debian/.*_stamp debian/*.1 pax
 	+for opts in '-flto=jobserver' '-fwhole-program --combine' ''; do \
 		set -x; \
-		${CC} ${CPPFLAGS} ${CFLAGS} $$opts ${LDFLAGS} -o mirpax \
+		${CC} ${CPPFLAGS} ${CFLAGS} $$opts ${LDFLAGS} -o pax \
 		    ar_io.c ar_subs.c buf_subs.c cache.c cpio.c file_subs.c \
 		    ftree.c gen_subs.c getoldopt.c options.c pat_rep.c pax.c \
 		    sel_subs.c tables.c tar.c tty_subs.c ar.c ${LDADD}; \
-		test -x mirpax && exit 0; \
+		test -x pax && exit 0; \
 	done; echo >&2 Compiling failed.; exit 1
-	for prog in cpio pax tar; do \
-		(echo .nr g 1; cat $$prog.1) >mir$$prog.1; \
-	done
+	echo .nr g 2 | cat - cpio.1 >debian/paxcpio.1
+	echo .nr g 2 | cat - pax.1 >debian/pax.1
+	echo .nr g 2 | cat - tar.1 >debian/paxtar.1
 	@:>$@
 
 clean:
 	dh_testdir
-	-rm -f debian/.*_stamp mir*.1 mirpax
+	-rm -f debian/.*_stamp debian/*.1 pax
 	dh_clean
 
 binary-indep: build-indep
