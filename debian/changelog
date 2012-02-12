@@ -1,6 +1,7 @@
 mircpio (20110817-0wtf3) xwtf; urgency=low
 
   * debian/rules: cleanup (remove dh_installdirs, add back dh_clean)
+  * debian/rules: modernise; use fully hardened dpkg-buildflags
 
  -- Thorsten Glaser <tg@mirbsd.de>  Sat, 12 Nov 2011 00:08:05 +0000
 
