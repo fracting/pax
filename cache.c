@@ -1,5 +1,4 @@
-/**	$MirOS: src/bin/pax/cache.c,v 1.4 2007/02/17 04:52:40 tg Exp $ */
-/*	$OpenBSD: cache.c,v 1.17 2004/03/16 03:28:34 tedu Exp $	*/
+/*	$OpenBSD: cache.c,v 1.19 2009/12/22 12:09:36 jasper Exp $	*/
 /*	$NetBSD: cache.c,v 1.4 1995/03/21 09:07:10 cgd Exp $	*/
 
 /*-
@@ -48,8 +47,7 @@
 #include "cache.h"
 #include "extern.h"
 
-__SCCSID("@(#)cache.c	8.1 (Berkeley) 5/31/93");
-__RCSID("$MirOS: src/bin/pax/cache.c,v 1.4 2007/02/17 04:52:40 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/cache.c,v 1.6 2012/02/12 01:02:05 tg Exp $");
 
 /*
  * routines that control user, group, uid and gid caches (for the archive
@@ -195,7 +193,9 @@ name_uid(uid_t uid, int frc)
 	 * No entry for this uid, we will add it
 	 */
 	if (!pwopn) {
-#if !defined(__INTERIX) && !defined(__GLIBC__)
+#if defined(__GLIBC__)
+		setpwent();
+#elif !defined(__INTERIX)
 		setpassent(1);
 #endif
 		++pwopn;
@@ -263,7 +263,9 @@ name_gid(gid_t gid, int frc)
 	 * No entry for this gid, we will add it
 	 */
 	if (!gropn) {
-#if !defined(__INTERIX) && !defined(__GLIBC__)
+#if defined(__GLIBC__)
+		setgrent();
+#elif !defined(__INTERIX)
 		setgroupent(1);
 #endif
 		++gropn;
@@ -274,7 +276,7 @@ name_gid(gid_t gid, int frc)
 	if ((gr = getgrgid(gid)) == NULL) {
 		/*
 		 * no match for this gid in the local group file, put in
-		 * a string that is the gid in numberic format
+		 * a string that is the gid in numeric format
 		 */
 		if (ptr == NULL)
 			return("");
@@ -332,7 +334,9 @@ uid_name(const char *name, uid_t *uid)
 	}
 
 	if (!pwopn) {
-#if !defined(__INTERIX) && !defined(__GLIBC__)
+#if defined(__GLIBC__)
+		setpwent();
+#elif !defined(__INTERIX)
 		setpassent(1);
 #endif
 		++pwopn;
@@ -397,7 +401,9 @@ gid_name(const char *name, gid_t *gid)
 	}
 
 	if (!gropn) {
-#if !defined(__INTERIX) && !defined(__GLIBC__)
+#if defined(__GLIBC__)
+		setgrent();
+#elif !defined(__INTERIX)
 		setgroupent(1);
 #endif
 		++gropn;
