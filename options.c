@@ -58,7 +58,7 @@
 #include <sys/mtio.h>
 #endif
 
-__RCSID("$MirOS: src/bin/pax/options.c,v 1.41 2012/02/12 01:02:06 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/options.c,v 1.44 2012/02/16 17:27:31 tg Exp $");
 
 #ifndef _PATH_DEFTAPE
 #define _PATH_DEFTAPE "/dev/rmt0"
@@ -288,13 +288,13 @@ pax_options(int argc, char **argv)
 			/*
 			 * use xz (non-standard option)
 			 */
-			gzip_program = XZ_CMD;
+			compress_program = XZ_CMD;
 			break;
 		case 'j':
 			/*
 			 * use bzip2 (non-standard option)
 			 */
-			gzip_program = BZIP2_CMD;
+			compress_program = BZIP2_CMD;
 			break;
 		case 'k':
 			/*
@@ -437,7 +437,7 @@ pax_options(int argc, char **argv)
 			/*
 			 * use gzip (non-standard option)
 			 */
-			gzip_program = GZIP_CMD;
+			compress_program = GZIP_CMD;
 			break;
 		case 'B':
 			/*
@@ -738,13 +738,13 @@ tar_options(int argc, char **argv)
 			/*
 			 * use xz (non-standard option)
 			 */
-			gzip_program = XZ_CMD;
+			compress_program = XZ_CMD;
 			break;
 		case 'j':
 			/*
 			 * use bzip2 (non-standard option)
 			 */
-			gzip_program = BZIP2_CMD;
+			compress_program = BZIP2_CMD;
 			break;
 		case 'm':
 			/*
@@ -826,7 +826,7 @@ tar_options(int argc, char **argv)
 			/*
 			 * use gzip (non-standard option)
 			 */
-			gzip_program = GZIP_CMD;
+			compress_program = GZIP_CMD;
 			break;
 		case 'B':
 			/*
@@ -897,7 +897,7 @@ tar_options(int argc, char **argv)
 			/*
 			 * use compress
 			 */
-			gzip_program = COMPRESS_CMD;
+			compress_program = COMPRESS_CMD;
 			break;
 		case '0':
 			arcname = DEV_0;
@@ -1187,7 +1187,7 @@ cpio_options(int argc, char **argv)
 	dflag = 1;
 	nodirs = 1;
 	while ((c = getopt(argc, argv,
-	    "6AaBbC:cdE:F:fH:I:iJjkLlM:mO:oprSstuvZz")) != -1)
+	    "6AaBbC:cdE:F:fH:I:iJjkLlM:mO:oprSstuVvZz")) != -1)
 		switch (c) {
 			case 'a':
 				/*
@@ -1228,13 +1228,13 @@ cpio_options(int argc, char **argv)
 				/*
 				 * use xz (non-standard option)
 				 */
-				gzip_program = XZ_CMD;
+				compress_program = XZ_CMD;
 				break;
 			case 'j':
 				/*
 				 * use bzip2 (non-standard option)
 				 */
-				gzip_program = BZIP2_CMD;
+				compress_program = BZIP2_CMD;
 				break;
 			case 'k':
 				break;
@@ -1287,6 +1287,12 @@ cpio_options(int argc, char **argv)
 				 */
 				kflag = 0;
 				break;
+			case 'V':
+				/*
+				 * print a dot for each file processed
+				 */
+				Vflag++;
+				break;
 			case 'v':
 				/*
 				 * verbose operation mode
@@ -1297,7 +1303,7 @@ cpio_options(int argc, char **argv)
 				/*
 				 * use gzip (non-standard option)
 				 */
-				gzip_program = GZIP_CMD;
+				compress_program = GZIP_CMD;
 				break;
 			case 'A':
 				/*
@@ -1395,7 +1401,7 @@ cpio_options(int argc, char **argv)
 				/*
 				 * use compress (non-standard option)
 				 */
-				gzip_program = COMPRESS_CMD;
+				compress_program = COMPRESS_CMD;
 				break;
 			case '6':
 				/*
@@ -1609,48 +1615,51 @@ opt_add(const char *str)
  *	0 for an error, a positive value o.w.
  */
 
+#ifndef LONG_OFF_T
+#define OT_MAX	ULLONG_MAX
+#define strtoot	strtoull
+#else
+#define OT_MAX	ULONG_MAX
+#define strtoot	strtoul
+#endif
+
 static off_t
 str_offt(char *val)
 {
 	char *expr;
-	off_t num, t;
+	ot_type num, t;
 
-#	ifdef LONG_OFF_T
-	num = strtol(val, &expr, 0);
-	if ((num == LONG_MAX) || (num <= 0) || (expr == val))
-#	else
-	num = strtoq(val, &expr, 0);
-	if ((num == QUAD_MAX) || (num <= 0) || (expr == val))
-#	endif
-		return(0);
+	num = strtoot(val, &expr, 0);
+	if ((num == OT_MAX) || (num <= 0) || (expr == val))
+		return (0);
 
 	switch (*expr) {
 	case 'b':
 		t = num;
 		num *= 512;
 		if (t > num)
-			return(0);
+			return (0);
 		++expr;
 		break;
 	case 'k':
 		t = num;
 		num *= 1024;
 		if (t > num)
-			return(0);
+			return (0);
 		++expr;
 		break;
 	case 'm':
 		t = num;
 		num *= 1048576;
 		if (t > num)
-			return(0);
+			return (0);
 		++expr;
 		break;
 	case 'w':
 		t = num;
 		num *= sizeof(int);
 		if (t > num)
-			return(0);
+			return (0);
 		++expr;
 		break;
 	}
@@ -1663,12 +1672,12 @@ str_offt(char *val)
 			t = num;
 			num *= str_offt(expr + 1);
 			if (t > num)
-				return(0);
+				return (0);
 			break;
 		default:
-			return(0);
+			return (0);
 	}
-	return(num);
+	return ((off_t)num);
 }
 
 char *
@@ -1764,11 +1773,11 @@ void
 cpio_usage(void)
 {
 	(void)fputs(
-	    "usage: cpio -o [-AaBcJjLvZz] [-C bytes] [-F archive] [-H format]\n"
+	    "usage: cpio -o [-AaBcJjLVvZz] [-C bytes] [-F archive] [-H format]\n"
 	    "               [-M flag] [-O archive] <name-list [>archive]\n"
-	    "       cpio -i [-6BbcdfJjmrSstuvZz] [-C bytes] [-E file] [-F archive]\n"
+	    "       cpio -i [-6BbcdfJjmrSstuVvZz] [-C bytes] [-E file] [-F archive]\n"
 	    "               [-H format] [-I archive] [-M flag] [pattern ...] [<archive]\n"
-	    "       cpio -p [-adLlmuv] destination-directory <name-list\n",
+	    "       cpio -p [-adLlmuVv] destination-directory <name-list\n",
 	    stderr);
 	exit(1);
 }

@@ -52,7 +52,7 @@
 #include "pax.h"
 #include "extern.h"
 
-__RCSID("$MirOS: src/bin/pax/pax.c,v 1.12 2012/02/12 01:22:20 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/pax.c,v 1.16 2012/02/16 17:34:35 tg Exp $");
 
 static int gen_init(void);
 static void sig_cleanup(int) __attribute__((__noreturn__));
@@ -75,6 +75,7 @@ int	lflag;			/* use hard links when possible */
 int	nflag;			/* select first archive member match */
 int	tflag;			/* restore access time after read */
 int	uflag;			/* ignore older modification time files */
+int	Vflag = 0;		/* print a dot for each file processed */
 int	vflag;			/* produce verbose output */
 int	Dflag;			/* same as uflag except inode change time */
 int	Hflag;			/* follow command line symlinks (write only) */
@@ -83,7 +84,7 @@ int	Xflag;			/* archive files with same device id only */
 int	Yflag;			/* same as Dflag except after name mode */
 int	Zflag;			/* same as uflag except after name mode */
 int	zeroflag;		/* use \0 as pathname terminator */
-int	vfpart;			/* is partial verbose output in progress */
+int	vfpart = 0;		/* is partial verbose output in progress */
 int	patime = 1;		/* preserve file access time */
 int	pmtime = 1;		/* preserve file modification times */
 int	nodirs;			/* do not create directories as needed */
@@ -274,15 +275,16 @@ main(int argc, char **argv)
 		archive();
 		break;
 	case APPND:
-		if (gzip_program != NULL)
-			errx(1, "can not gzip while appending");
+		if (compress_program != NULL)
+			errx(1, "cannot compress while appending");
 		append();
 		break;
 	case COPY:
 		copy();
 		break;
 	default:
-		act = LIST;	/* for ar_io.c &c. */
+		/* for ar_io.c etc. */
+		act = LIST;
 	case LIST:
 		list();
 		break;
@@ -302,7 +304,14 @@ main(int argc, char **argv)
 static void
 sig_cleanup(int which_sig)
 {
-	char errbuf[80];
+	/*
+	 * The definition of this array doubles as compile-time assert
+	 * on the size of long, off_t, and whether LONG_OFF_T is used,
+	 * or not, correctly; target size is 80, error size -1.
+	 */
+	char errbuf[((sizeof(long) >= 4) &&
+	    (sizeof(ot_type) >= 4) &&
+	    (sizeof(ot_type) == sizeof(off_t))) ? 80 : -1];
 
 	/*
 	 * restore modes and times for any dirs we may have created
