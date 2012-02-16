@@ -1,8 +1,9 @@
-pax (1:20120212-2) unstable; urgency=low
+pax (1:20120216-1) unstable; urgency=low
 
   * Debian GNU/kFreeBSD uses 64-bit off_t line FreeBSD®, unlike GNU
+  * Implement GNU cpio ‘-V’ option
 
- -- Thorsten Glaser <tg@mirbsd.de>  Sun, 12 Feb 2012 03:42:55 +0000
+ -- Thorsten Glaser <tg@mirbsd.de>  Thu, 16 Feb 2012 18:01:39 +0000
 
 pax (1:20120212-1) unstable; urgency=low
 

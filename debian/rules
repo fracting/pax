@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# $MirOS: pax/debian/rules,v 1.9 2012/02/12 03:43:12 tg Exp $
+# $MirOS: pax/debian/rules,v 1.10 2012/02/16 18:02:24 tg Exp $
 
 DEB_HOST_ARCH_OS=$(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
@@ -34,10 +34,10 @@ debian/.build_stamp:
 	-rm -f debian/.*_stamp debian/*.1 pax
 	+for opts in '-flto=jobserver' '-fwhole-program --combine' ''; do \
 		set -x; \
-		${CC} ${CPPFLAGS} ${CFLAGS} $$opts ${LDFLAGS} -o pax \
+		${CC} ${CPPFLAGS} ${CFLAGS} $$opts ${LDFLAGS} -o pax ar.c \
 		    ar_io.c ar_subs.c buf_subs.c cache.c cpio.c file_subs.c \
 		    ftree.c gen_subs.c getoldopt.c options.c pat_rep.c pax.c \
-		    sel_subs.c tables.c tar.c tty_subs.c ar.c ${LDADD}; \
+		    sel_subs.c tables.c tar.c tty_subs.c ${LDADD}; \
 		test -x pax && exit 0; \
 	done; echo >&2 Compiling failed.; exit 1
 	echo .nr g 2 | cat - cpio.1 >debian/paxcpio.1
