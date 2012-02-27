@@ -3,7 +3,9 @@ pax (1:20120216-2) unstable; urgency=low
   * Update options.c to version from CVS to ensure the order of
     command line arguments in the cpio front-end more tightly,
     to prevent creating archives in the wrong format accidentally
+  * Link with --as-needed (not enough to workaround #650145 though ☹)
   * Policy 3.9.3 (no changes)
+  * Mention non-support of ACLs/EAs in the long description
 
  -- Thorsten Glaser <tg@mirbsd.de>  Mon, 27 Feb 2012 22:37:12 +0000
 
