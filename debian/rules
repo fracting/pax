@@ -1,11 +1,12 @@
 #!/usr/bin/make -f
-# $MirOS: pax/debian/rules,v 1.10 2012/02/16 18:02:24 tg Exp $
+# $MirOS: pax/debian/rules,v 1.11 2012/02/27 22:41:59 tg Exp $
 
 DEB_HOST_ARCH_OS=$(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
 CC?=			gcc
 EXTRA_CFLAGS=		-Wall -Wextra -Wformat -fno-strict-aliasing
 EXTRA_CPPFLAGS=		-DUSE_LIBBSD
+EXTRA_LDFLAGS=		-Wl,--as-needed
 
 ifneq (kfreebsd,${DEB_HOST_ARCH_OS})
 EXTRA_CPPFLAGS+=	-DLONG_OFF_T
@@ -15,6 +16,7 @@ ifneq (,$(wildcard /usr/share/dpkg/buildflags.mk))
 # dpkg-dev (>= 1.16.1~)
 DEB_CFLAGS_MAINT_APPEND=${EXTRA_CFLAGS}
 DEB_CPPFLAGS_MAINT_APPEND=${EXTRA_CPPFLAGS}
+DEB_LDFLAGS_MAINT_APPEND=${EXTRA_LDFLAGS}
 DEB_BUILD_MAINT_OPTIONS=hardening=+all
 include /usr/share/dpkg/buildflags.mk
 else
@@ -22,6 +24,7 @@ else
 CFLAGS=			-O$(if $(findstring noopt,${DEB_BUILD_OPTIONS}),0,2) -g
 CFLAGS+=		${EXTRA_CFLAGS}
 CPPFLAGS+=		${EXTRA_CPPFLAGS}
+LDFLAGS+=		${EXTRA_LDFLAGS}
 endif
 
 LDADD+=			-lbsd

@@ -1,3 +1,13 @@
+pax (1:20120216-2) unstable; urgency=low
+
+  * Update options.c to version from CVS to ensure the order of
+    command line arguments in the cpio front-end more tightly,
+    to prevent creating archives in the wrong format accidentally
+  * Link with --as-needed to work around a GCC/LTO cosmetic bug
+  * Policy 3.9.3 (no changes)
+
+ -- Thorsten Glaser <tg@mirbsd.de>  Mon, 27 Feb 2012 22:37:12 +0000
+
 pax (1:20120216-1) unstable; urgency=low
 
   * Debian GNU/kFreeBSD uses 64-bit off_t line FreeBSD®, unlike GNU

@@ -1,8 +1,9 @@
-/*	$OpenBSD: options.c,v 1.67 2007/02/24 09:50:55 jmc Exp $	*/
+/*	$OpenBSD: options.c,v 1.74 2010/12/02 04:08:27 tedu Exp $	*/
 /*	$NetBSD: options.c,v 1.6 1996/03/26 23:54:18 mrg Exp $	*/
 
 /*-
- * Copyright (c) 2005, 2006, 2007 Thorsten Glaser <tg@66h.42h.de>
+ * Copyright (c) 2005, 2006, 2007, 2012
+ *	Thorsten Glaser <tg@mirbsd.org>
  * Copyright (c) 1992 Keith Muller.
  * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -38,9 +39,6 @@
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/stat.h>
-#ifndef __INTERIX
-#include <sys/mtio.h>
-#endif
 #include <stdio.h>
 #include <string.h>
 #include <err.h>
@@ -53,10 +51,18 @@
 #include "options.h"
 #include "cpio.h"
 #include "tar.h"
+#include "ar.h"
 #include "extern.h"
 
-__SCCSID("@(#)options.c	8.2 (Berkeley) 4/18/94");
-__RCSID("$MirOS: src/bin/pax/options.c,v 1.26 2008/08/07 19:40:39 tg Exp $");
+#if HAS_TAPE
+#include <sys/mtio.h>
+#endif
+
+__RCSID("$MirOS: src/bin/pax/options.c,v 1.46 2012/02/27 22:31:01 tg Exp $");
+
+#ifndef _PATH_DEFTAPE
+#define _PATH_DEFTAPE "/dev/rmt0"
+#endif
 
 #ifdef __GLIBC__
 char *fgetln(FILE *, size_t *);
@@ -71,30 +77,33 @@ static OPLIST *ophead = NULL;	/* head for format specific options -x */
 static OPLIST *optail = NULL;	/* option tail */
 
 static int no_op(void);
+static int no_op_i(int);
 static void printflg(unsigned int);
 static int c_frmt(const void *, const void *);
 static off_t str_offt(char *);
-static char *getline(FILE *fp);
+static char *get_line(FILE *fp);
 static void pax_options(int, char **);
-static void pax_usage(void) __attribute__((noreturn));
+static void pax_usage(void) __attribute__((__noreturn__));
 static void tar_set_action(int);
 static void tar_options(int, char **);
-static void tar_usage(void) __attribute__((noreturn));
+static void tar_usage(void) __attribute__((__noreturn__));
 static void cpio_set_action(int);
 static void cpio_options(int, char **);
-static void cpio_usage(void) __attribute__((noreturn));
+static void cpio_usage(void) __attribute__((__noreturn__));
 int mkpath(char *);
 
 static void process_M(const char *, void (*)(void));
 
-/* errors from getline */
-#define GETLINE_FILE_CORRUPT 1
-#define GETLINE_OUT_OF_MEM 2
-static int getline_error;
+/* errors from get_line */
+#define GET_LINE_FILE_CORRUPT 1
+#define GET_LINE_OUT_OF_MEM 2
+static int get_line_error;
 
 
 #define GZIP_CMD	"gzip"		/* command to run as gzip */
 #define COMPRESS_CMD	"compress"	/* command to run as compress */
+#define BZIP2_CMD	"bzip2"		/* command to run as bzip2 */
+#define XZ_CMD		"xz"		/* command to run as xz */
 
 /*
  *	Format specific routine table - MUST BE IN SORTED ORDER BY NAME
@@ -102,69 +111,75 @@ static int getline_error;
  *
  * 	name, blksz, hdsz, udev, hlk, blkagn, inhead, id, st_read,
  *	read, end_read, st_write, write, end_write, trail,
- *	rd_data, wr_data, options
+ *	rd_data, wr_data, options, is_uar
  */
 
 FSUB fsub[] = {
-/* 0: OLD BINARY CPIO */
+/* 0: UNIX ARCHIVER */
+	{"ar", 512, sizeof(HD_AR), 0, 0, 0, 0, uar_id, no_op,
+	uar_rd, uar_endrd, uar_stwr, uar_wr, no_op, uar_trail,
+	rd_wrfile, uar_wr_data, bad_opt, 1},
+
+/* 1: OLD BINARY CPIO */
 	{"bcpio", 5120, sizeof(HD_BCPIO), 1, 0, 0, 1, bcpio_id, cpio_strd,
 	bcpio_rd, bcpio_endrd, cpio_stwr, bcpio_wr, cpio_endwr, cpio_trail,
-	rd_wrfile, wr_rdfile, bad_opt},
+	rd_wrfile, wr_rdfile, bad_opt, 0},
 
-/* 1: OLD OCTAL CHARACTER CPIO */
+/* 2: OLD OCTAL CHARACTER CPIO */
 	{"cpio", 5120, sizeof(HD_CPIO), 1, 0, 0, 1, cpio_id, cpio_strd,
 	cpio_rd, cpio_endrd, cpio_stwr, cpio_wr, cpio_endwr, cpio_trail,
-	rd_wrfile, wr_rdfile, bad_opt},
+	rd_wrfile, wr_rdfile, bad_opt, 0},
 
-/* 2: OLD OCTAL CHARACTER CPIO, UID/GID CLEARED (ANONYMISED) */
+/* 3: OLD OCTAL CHARACTER CPIO, UID/GID CLEARED (ANONYMISED) */
 	{"dist", 512, sizeof(HD_CPIO), 1, 0, 0, 1, cpio_id, cpio_strd,
 	cpio_rd, cpio_endrd, dist_stwr, cpio_wr, cpio_endwr, cpio_trail,
-	rd_wrfile, wr_rdfile, bad_opt},
+	rd_wrfile, wr_rdfile, bad_opt, 0},
 
-/* 3: SVR4 HEX CPIO */
+/* 4: SVR4 HEX CPIO */
 	{"sv4cpio", 5120, sizeof(HD_VCPIO), 1, 0, 0, 1, vcpio_id, cpio_strd,
 	vcpio_rd, vcpio_endrd, cpio_stwr, vcpio_wr, cpio_endwr, cpio_trail,
-	rd_wrfile, wr_rdfile, bad_opt},
+	rd_wrfile, wr_rdfile, bad_opt, 0},
 
-/* 4: SVR4 HEX CPIO WITH CRC */
+/* 5: SVR4 HEX CPIO WITH CRC */
 	{"sv4crc", 5120, sizeof(HD_VCPIO), 1, 0, 0, 1, crc_id, crc_strd,
 	vcpio_rd, vcpio_endrd, crc_stwr, vcpio_wr, cpio_endwr, cpio_trail,
-	rd_wrfile, wr_rdfile, bad_opt},
+	rd_wrfile, wr_rdfile, bad_opt, 0},
 
-/* 5: OLD TAR */
+/* 6: OLD TAR */
 	{"tar", 10240, BLKMULT, 0, 1, BLKMULT, 0, tar_id, no_op,
-	tar_rd, tar_endrd, no_op, tar_wr, tar_endwr, tar_trail,
-	rd_wrfile, wr_rdfile, tar_opt},
+	tar_rd, tar_endrd, no_op_i, tar_wr, tar_endwr, tar_trail,
+	rd_wrfile, wr_rdfile, tar_opt, 0},
 
-/* 6: POSIX USTAR */
+/* 7: POSIX USTAR */
 	{"ustar", 10240, BLKMULT, 0, 1, BLKMULT, 0, ustar_id, ustar_strd,
 	ustar_rd, tar_endrd, ustar_stwr, ustar_wr, tar_endwr, tar_trail,
-	rd_wrfile, wr_rdfile, bad_opt},
+	rd_wrfile, wr_rdfile, bad_opt, 0},
 
-/* 7: SVR4 HEX CPIO WITH CRC, UID/GID/MTIME CLEARED (NORMALISED) */
+/* 8: SVR4 HEX CPIO WITH CRC, UID/GID/MTIME CLEARED (NORMALISED) */
 	{"v4norm", 512, sizeof(HD_VCPIO), 1, 0, 0, 1, crc_id, crc_strd,
 	vcpio_rd, vcpio_endrd, v4norm_stwr, vcpio_wr, cpio_endwr, cpio_trail,
-	rd_wrfile, wr_rdfile, bad_opt},
+	rd_wrfile, wr_rdfile, bad_opt, 0},
 
-/* 8: SVR4 HEX CPIO WITH CRC, UID/GID CLEARED (ANONYMISED) */
+/* 9: SVR4 HEX CPIO WITH CRC, UID/GID CLEARED (ANONYMISED) */
 	{"v4root", 512, sizeof(HD_VCPIO), 1, 0, 0, 1, crc_id, crc_strd,
 	vcpio_rd, vcpio_endrd, v4root_stwr, vcpio_wr, cpio_endwr, cpio_trail,
-	rd_wrfile, wr_rdfile, bad_opt},
+	rd_wrfile, wr_rdfile, bad_opt, 0},
 };
-#define	F_OCPIO	0	/* format when called as cpio -6 */
-#define	F_ACPIO	1	/* format when called as cpio -c */
-#define	F_NCPIO	3	/* format when called as tar -R */
-#define	F_CPIO	4	/* format when called as cpio or tar -S */
-#define F_OTAR	5	/* format when called as tar -o */
-#define F_TAR	6	/* format when called as tar */
-#define DEFLT	6	/* default write format from list above */
+#define	F_OCPIO	1	/* format when called as cpio -6 */
+#define	F_ACPIO	2	/* format when called as cpio -c */
+#define	F_NCPIO	4	/* format when called as tar -R */
+#define	F_CPIO	5	/* format when called as cpio or tar -S */
+#define F_OTAR	6	/* format when called as tar -o */
+#define F_TAR	7	/* format when called as tar */
+int F_UAR = 0;
+#define DEFLT	7	/* default write format from list above */
 
 /*
  * ford is the archive search order used by get_arc() to determine what kind
  * of archive we are dealing with. This helps to properly id archive formats
  * some formats may be subsets of others....
  */
-int ford[] = {6, 5, 4, 3, 1, 0, -1 };
+int ford[] = { 7, 6, 5, 4, 2, 1, -1 };
 
 /* normalise archives */
 int anonarch = 0;
@@ -189,7 +204,7 @@ options(int argc, char **argv)
 	size_t n;
 
 	/*
-	 * Are we acting like pax, tar or cpio (based on argv[0])
+	 * are we acting like pax, tar or cpio (based on argv[0])
 	 */
 	if ((n = strlen(argv[0])) >= 3 && !strcmp(argv[0] + n - 3, NM_TAR)) {
 		argv0 = NM_TAR;
@@ -222,8 +237,8 @@ pax_options(int argc, char **argv)
 	/*
 	 * process option flags
 	 */
-	while ((c=getopt(argc,argv,"ab:cdf:iklno:p:rs:tuvwx:zB:DE:G:HLM:OPT:U:XYZ0"))
-	    != -1) {
+	while ((c = getopt(argc, argv,
+	    "0aB:b:cDdE:f:G:HiJjkLlM:nOo:Pp:rs:T:tU:uvwXx:YZz")) != -1) {
 		switch (c) {
 		case 'a':
 			/*
@@ -268,6 +283,18 @@ pax_options(int argc, char **argv)
 			 */
 			iflag = 1;
 			flg |= IF;
+			break;
+		case 'J':
+			/*
+			 * use xz (non-standard option)
+			 */
+			compress_program = XZ_CMD;
+			break;
+		case 'j':
+			/*
+			 * use bzip2 (non-standard option)
+			 */
+			compress_program = BZIP2_CMD;
 			break;
 		case 'k':
 			/*
@@ -380,7 +407,7 @@ pax_options(int argc, char **argv)
 			/*
 			 * verbose operation mode
 			 */
-			vflag = 1;
+			vflag++;
 			flg |= VF;
 			break;
 		case 'w':
@@ -408,9 +435,9 @@ pax_options(int argc, char **argv)
 			break;
 		case 'z':
 			/*
-			 * use gzip.  Non standard option.
+			 * use gzip (non-standard option)
 			 */
-			gzip_program = GZIP_CMD;
+			compress_program = GZIP_CMD;
 			break;
 		case 'B':
 			/*
@@ -430,8 +457,8 @@ pax_options(int argc, char **argv)
 			break;
 		case 'D':
 			/*
-			 * On extraction check file inode change time before the
-			 * modification of the file name. Non standard option.
+			 * on extraction check file inode change time before the
+			 * modification of the file name (non-standard option)
 			 */
 			Dflag = 1;
 			flg |= CDF;
@@ -606,7 +633,7 @@ pax_options(int argc, char **argv)
 		}
 		--argc;
 		dirptr = argv[argc];
-		/* FALL THROUGH */
+		/* FALLTHROUGH */
 	case ARCHIVE:
 	case APPND:
 		for (; optind < argc; optind++)
@@ -650,7 +677,7 @@ tar_options(int argc, char **argv)
 	struct incfile *incfiles = NULL;
 
 	/*
-	 * Set default values.
+	 * set default values
 	 */
 	rmleadslash = 1;
 
@@ -658,8 +685,11 @@ tar_options(int argc, char **argv)
 	 * process option flags
 	 */
 	while ((c = getoldopt(argc, argv,
-	    "b:cef:hmopqruts:vwxzBC:HI:LM:OPRSXZ014578")) != -1) {
+	    "014578ABb:C:cef:HhI:JjLM:mNOoPpqRrSs:tuvwXxZz")) != -1) {
 		switch (c) {
+		case 'A':
+			Oflag = 5;
+			break;
 		case 'b':
 			/*
 			 * specify blocksize in 512-byte blocks
@@ -668,7 +698,8 @@ tar_options(int argc, char **argv)
 				paxwarn(1, "Invalid block size %s", optarg);
 				tar_usage();
 			}
-			wrblksz *= 512;		/* XXX - check for int oflow */
+			/* XXX - check for integer overflow */
+			wrblksz *= 512;
 			break;
 		case 'c':
 			/*
@@ -702,6 +733,18 @@ tar_options(int argc, char **argv)
 			 * follow symlinks
 			 */
 			Lflag = 1;
+			break;
+		case 'J':
+			/*
+			 * use xz (non-standard option)
+			 */
+			compress_program = XZ_CMD;
+			break;
+		case 'j':
+			/*
+			 * use bzip2 (non-standard option)
+			 */
+			compress_program = BZIP2_CMD;
 			break;
 		case 'm':
 			/*
@@ -738,11 +781,11 @@ tar_options(int argc, char **argv)
 			break;
 		case 'R':
 			Oflag = 3;
-			anonarch = ANON_INODES | ANON_HARDLINKS;
+			anonarch |= ANON_INODES | ANON_HARDLINKS;
 			break;
 		case 'S':
 			Oflag = 4;
-			anonarch = ANON_INODES | ANON_HARDLINKS;
+			anonarch |= ANON_INODES | ANON_HARDLINKS;
 			break;
 		case 's':
 			/*
@@ -781,13 +824,13 @@ tar_options(int argc, char **argv)
 			break;
 		case 'z':
 			/*
-			 * use gzip.  Non standard option.
+			 * use gzip (non-standard option)
 			 */
-			gzip_program = GZIP_CMD;
+			compress_program = GZIP_CMD;
 			break;
 		case 'B':
 			/*
-			 * Nothing to do here, this is pax default
+			 * nothing to do here, this is pax default
 			 */
 			break;
 		case 'C':
@@ -802,14 +845,20 @@ tar_options(int argc, char **argv)
 			break;
 		case 'I':
 			if (++nincfiles > incfiles_max) {
-				incfiles_max = nincfiles + 3;
-				incfiles = realloc(incfiles,
-				    sizeof(*incfiles) * incfiles_max);
-				if (incfiles == NULL) {
+				size_t n = nincfiles + 3;
+				struct incfile *p;
+
+				p = realloc(incfiles,
+				    sizeof(*incfiles) * n);
+				if (p == NULL) {
+					free(incfiles);
+					incfiles = NULL;
 					paxwarn(0, "Unable to allocate space "
 					    "for option list");
 					exit(1);
 				}
+				incfiles = p;
+				incfiles_max = n;
 			}
 			incfiles[nincfiles - 1].file = optarg;
 			incfiles[nincfiles - 1].dir = chdname;
@@ -821,7 +870,16 @@ tar_options(int argc, char **argv)
 			Lflag = 1;
 			break;
 		case 'M':
+			/*
+			 * MirOS extension: archive normaliser
+			 */
 			process_M(optarg, tar_usage);
+			break;
+		case 'N':
+			/*
+			 * numeric uid and gid only
+			 */
+			anonarch |= ANON_NUMID;
 			break;
 		case 'P':
 			/*
@@ -837,9 +895,9 @@ tar_options(int argc, char **argv)
 			break;
 		case 'Z':
 			/*
-			 * use compress.
+			 * use compress
 			 */
-			gzip_program = COMPRESS_CMD;
+			compress_program = COMPRESS_CMD;
 			break;
 		case '0':
 			arcname = DEV_0;
@@ -867,17 +925,17 @@ tar_options(int argc, char **argv)
 	argc -= optind;
 	argv += optind;
 
-	/* Tar requires an action. */
+	/* tar requires an action. */
 	if (act == ERROR)
 		tar_usage();
 
-	/* Traditional tar behaviour (pax uses stderr unless in list mode) */
+	/* traditional tar behaviour (pax uses stderr unless in list mode) */
 	if (fstdin == 1 && act == ARCHIVE)
 		listf = stderr;
 	else
 		listf = stdout;
 
-	/* Traditional tar behaviour (pax wants to read file list from stdin) */
+	/* traditional tar behaviour (pax wants to read file list from stdin) */
 	if ((act == ARCHIVE || act == APPND) && argc == 0 && nincfiles == 0)
 		exit(0);
 
@@ -924,14 +982,14 @@ tar_options(int argc, char **argv)
 						paxwarn(1, "Unable to open file '%s' for read", file);
 						tar_usage();
 					}
-					while ((str = getline(fp)) != NULL) {
+					while ((str = get_line(fp)) != NULL) {
 						if (pat_add(str, dir) < 0)
 							tar_usage();
 						sawpat = 1;
 					}
 					if (strcmp(file, "-") != 0)
 						fclose(fp);
-					if (getline_error) {
+					if (get_line_error) {
 						paxwarn(1, "Problem with file '%s'", file);
 						tar_usage();
 					}
@@ -974,12 +1032,16 @@ tar_options(int argc, char **argv)
 		    case 4:
 			frmt = &(fsub[F_CPIO]);
 			break;
+		    case 5:
+			frmt = &(fsub[F_UAR]);
+			break;
 		    default:
 			tar_usage();
 			break;
 		}
 
-		if (chdname != NULL) {	/* initial chdir() */
+		if (chdname != NULL) {
+			/* initial chdir() */
 			if (ftree_add(chdname, 1) < 0)
 				tar_usage();
 		}
@@ -1009,7 +1071,7 @@ tar_options(int argc, char **argv)
 				FILE *fp;
 				char *str;
 
-				/* Set directory if needed */
+				/* set directory if needed */
 				if (dir) {
 					if (ftree_add(dir, 1) < 0)
 						tar_usage();
@@ -1021,13 +1083,13 @@ tar_options(int argc, char **argv)
 					paxwarn(1, "Unable to open file '%s' for read", file);
 					tar_usage();
 				}
-				while ((str = getline(fp)) != NULL) {
+				while ((str = get_line(fp)) != NULL) {
 					if (ftree_add(str, 0) < 0)
 						tar_usage();
 				}
 				if (strcmp(file, "-") != 0)
 					fclose(fp);
-				if (getline_error) {
+				if (get_line_error) {
 					paxwarn(1, "Problem with file '%s'",
 					    file);
 					tar_usage();
@@ -1051,10 +1113,8 @@ tar_options(int argc, char **argv)
 		to_stdout = 0;
 	if (!fstdin && ((arcname == NULL) || (*arcname == '\0'))) {
 		arcname = getenv("TAPE");
-#ifdef _PATH_DEFTAPE
 		if ((arcname == NULL) || (*arcname == '\0'))
 			arcname = _PATH_DEFTAPE;
-#endif
 	}
 }
 
@@ -1118,6 +1178,7 @@ cpio_options(int argc, char **argv)
 	char *str;
 	FSUB tmp;
 	FILE *fp;
+	const char *optstr;
 
 	kflag = 1;
 	pids = 1;
@@ -1126,212 +1187,243 @@ cpio_options(int argc, char **argv)
 	arcname = NULL;
 	dflag = 1;
 	nodirs = 1;
-	while ((c=getopt(argc,argv,"abcdfiklmoprstuvzABC:E:F:H:I:LM:O:SZ6")) != -1)
+	optstr = "iop";
+	opterr = 0;
+	while ((c = getopt(argc, argv, optstr)) != -1) {
 		switch (c) {
-			case 'a':
-				/*
-				 * preserve access time on files read
-				 */
-				tflag = 1;
-				break;
-			case 'b':
-				/*
-				 * swap bytes and half-words when reading data
-				 */
-				break;
-			case 'c':
-				/*
-				 * ASCII cpio header
-				 */
-				frmt = &(fsub[F_ACPIO]);
-				break;
-			case 'd':
-				/*
-				 * create directories as needed
-				 */
-				nodirs = 0;
-				break;
-			case 'f':
-				/*
-				 * invert meaning of pattern list
-				 */
-				cflag = 1;
-				break;
-			case 'i':
-				/*
-				 * restore an archive
-				 */
-				cpio_set_action(EXTRACT);
-				break;
-			case 'k':
-				break;
-			case 'l':
-				/*
-				 * use links instead of copies when possible
-				 */
-				lflag = 1;
-				break;
-			case 'm':
-				/*
-				 * preserve modification time
-				 */
-				pmtime = 1;
-				break;
-			case 'o':
-				/*
-				 * create an archive
-				 */
-				cpio_set_action(ARCHIVE);
-				frmt = &(fsub[F_CPIO]);
-				break;
-			case 'p':
-				/*
-				 * copy-pass mode
-				 */
-				cpio_set_action(COPY);
-				break;
-			case 'r':
-				/*
-				 * interactively rename files
-				 */
-				iflag = 1;
-				break;
-			case 's':
-				/*
-				 * swap bytes after reading data
-				 */
-				break;
-			case 't':
-				/*
-				 * list contents of archive
-				 */
-				cpio_set_action(LIST);
-				listf = stdout;
-				break;
-			case 'u':
-				/*
-				 * replace newer files
-				 */
-				kflag = 0;
-				break;
-			case 'v':
-				/*
-				 * verbose operation mode
-				 */
-				vflag = 1;
-				break;
-			case 'z':
-				/*
-				 * use gzip.  Non standard option.
-				 */
-				gzip_program = GZIP_CMD;
-				break;
-			case 'A':
-				/*
-				 * append mode
-				 */
-				cpio_set_action(APPND);
-				break;
-			case 'B':
-				/*
-				 * Use 5120 byte block size
-				 */
-				wrblksz = 5120;
-				break;
-			case 'C':
-				/*
-				 * set block size in bytes
-				 */
-				wrblksz = atoi(optarg);
-				break;
-			case 'E':
-				/*
-				 * file with patterns to extract or list
-				 */
-				if ((fp = fopen(optarg, "r")) == NULL) {
-					paxwarn(1, "Unable to open file '%s' for read", optarg);
-					cpio_usage();
-				}
-				while ((str = getline(fp)) != NULL) {
-					pat_add(str, NULL);
-				}
-				fclose(fp);
-				if (getline_error) {
-					paxwarn(1, "Problem with file '%s'", optarg);
-					cpio_usage();
-				}
-				break;
-			case 'F':
-			case 'I':
-			case 'O':
-				/*
-				 * filename where the archive is stored
-				 */
-				if ((optarg[0] == '-') && (optarg[1]== '\0')) {
-					/*
-					 * treat a - as stdin
-					 */
-					arcname = NULL;
-					break;
-				}
-				arcname = optarg;
-				break;
-			case 'H':
-				/*
-				 * specify an archive format on write
-				 */
-				if (!strcmp(optarg, "bin")) {
-					tmp.name = "bcpio";
-				} else if (!strcmp(optarg, "crc")) {
-					tmp.name = "sv4crc";
-				} else if (!strcmp(optarg, "newc")) {
-					tmp.name = "sv4cpio";
-				} else if (!strcmp(optarg, "odc")) {
-					tmp.name = "cpio";
-				} else {
-					tmp.name = optarg;
-				}
-				if ((frmt = (FSUB *)bsearch((void *)&tmp, (void *)fsub,
-				    sizeof(fsub)/sizeof(FSUB), sizeof(FSUB), c_frmt)) != NULL)
-					break;
-				paxwarn(1, "Unknown -H format: %s", optarg);
-				(void)fputs("cpio: Known -H formats are:", stderr);
-				for (i = 0; i < (sizeof(fsub)/sizeof(FSUB)); ++i)
-					(void)fprintf(stderr, " %s", fsub[i].name);
-				(void)fputs("\n\n", stderr);
+		case 'a':
+			/*
+			 * preserve access time on files read
+			 */
+			tflag = 1;
+			break;
+		case 'b':
+			/*
+			 * swap bytes and half-words when reading data
+			 */
+			break;
+		case 'c':
+			/*
+			 * ASCII cpio header
+			 */
+			frmt = &(fsub[F_ACPIO]);
+			break;
+		case 'd':
+			/*
+			 * create directories as needed
+			 */
+			nodirs = 0;
+			break;
+		case 'f':
+			/*
+			 * invert meaning of pattern list
+			 */
+			cflag = 1;
+			break;
+		case 'i':
+			/*
+			 * restore an archive
+			 */
+			cpio_set_action(EXTRACT);
+			break;
+		case 'J':
+			/*
+			 * use xz (non-standard option)
+			 */
+			compress_program = XZ_CMD;
+			break;
+		case 'j':
+			/*
+			 * use bzip2 (non-standard option)
+			 */
+			compress_program = BZIP2_CMD;
+			break;
+		case 'k':
+			break;
+		case 'l':
+			/*
+			 * use links instead of copies when possible
+			 */
+			lflag = 1;
+			break;
+		case 'm':
+			/*
+			 * preserve modification time
+			 */
+			pmtime = 1;
+			break;
+		case 'o':
+			/*
+			 * create an archive
+			 */
+			cpio_set_action(ARCHIVE);
+			frmt = &(fsub[F_CPIO]);
+			break;
+		case 'p':
+			/*
+			 * copy-pass mode
+			 */
+			cpio_set_action(COPY);
+			break;
+		case 'r':
+			/*
+			 * interactively rename files
+			 */
+			iflag = 1;
+			break;
+		case 's':
+			/*
+			 * swap bytes after reading data
+			 */
+			break;
+		case 't':
+			/*
+			 * list contents of archive
+			 */
+			cpio_set_action(LIST);
+			listf = stdout;
+			break;
+		case 'u':
+			/*
+			 * replace newer files
+			 */
+			kflag = 0;
+			break;
+		case 'V':
+			/*
+			 * print a dot for each file processed
+			 */
+			Vflag++;
+			break;
+		case 'v':
+			/*
+			 * verbose operation mode
+			 */
+			vflag++;
+			break;
+		case 'z':
+			/*
+			 * use gzip (non-standard option)
+			 */
+			compress_program = GZIP_CMD;
+			break;
+		case 'A':
+			/*
+			 * append mode
+			 */
+			cpio_set_action(APPND);
+			break;
+		case 'B':
+			/*
+			 * use 5120 byte block size
+			 */
+			wrblksz = 5120;
+			break;
+		case 'C':
+			/*
+			 * set block size in bytes
+			 */
+			wrblksz = atoi(optarg);
+			break;
+		case 'E':
+			/*
+			 * file with patterns to extract or list
+			 */
+			if ((fp = fopen(optarg, "r")) == NULL) {
+				paxwarn(1, "Unable to open file '%s' for read", optarg);
 				cpio_usage();
-				break;
-			case 'L':
-				/*
-				 * follow symbolic links
-				 */
-				Lflag = 1;
-				break;
-			case 'M':
-				process_M(optarg, cpio_usage);
-				break;
-			case 'S':
-				/*
-				 * swap halfwords after reading data
-				 */
-				break;
-			case 'Z':
-				/*
-				 * use compress.  Non standard option.
-				 */
-				gzip_program = COMPRESS_CMD;
-				break;
-			case '6':
-				/*
-				 * process Version 6 cpio format
-				 */
-				frmt = &(fsub[F_OCPIO]);
-				break;
-			case '?':
-			default:
+			}
+			while ((str = get_line(fp)) != NULL) {
+				pat_add(str, NULL);
+			}
+			fclose(fp);
+			if (get_line_error) {
+				paxwarn(1, "Problem with file '%s'", optarg);
 				cpio_usage();
+			}
+			break;
+		case 'F':
+		case 'I':
+		case 'O':
+			/*
+			 * filename where the archive is stored
+			 */
+			if ((optarg[0] == '-') && (optarg[1]== '\0')) {
+				/*
+				 * treat a - as stdin
+				 */
+				arcname = NULL;
 				break;
+			}
+			arcname = optarg;
+			break;
+		case 'H':
+			/*
+			 * specify an archive format on write
+			 */
+			if (!strcmp(optarg, "bin")) {
+				tmp.name = "bcpio";
+			} else if (!strcmp(optarg, "crc")) {
+				tmp.name = "sv4crc";
+			} else if (!strcmp(optarg, "newc")) {
+				tmp.name = "sv4cpio";
+			} else if (!strcmp(optarg, "odc")) {
+				tmp.name = "cpio";
+			} else {
+				tmp.name = optarg;
+			}
+			if ((frmt = (FSUB *)bsearch((void *)&tmp, (void *)fsub,
+			    sizeof(fsub)/sizeof(FSUB), sizeof(FSUB), c_frmt)) != NULL)
+				break;
+			paxwarn(1, "Unknown -H format: %s", optarg);
+			(void)fputs("cpio: Known -H formats are:", stderr);
+			for (i = 0; i < (sizeof(fsub)/sizeof(FSUB)); ++i)
+				(void)fprintf(stderr, " %s", fsub[i].name);
+			(void)fputs("\n\n", stderr);
+			cpio_usage();
+			break;
+		case 'L':
+			/*
+			 * follow symbolic links
+			 */
+			Lflag = 1;
+			break;
+		case 'M':
+			/*
+			 * MirOS extension: archive normaliser
+			 */
+			process_M(optarg, cpio_usage);
+			break;
+		case 'S':
+			/*
+			 * swap halfwords after reading data
+			 */
+			break;
+		case 'Z':
+			/*
+			 * use compress (non-standard option)
+			 */
+			compress_program = COMPRESS_CMD;
+			break;
+		case '6':
+			/*
+			 * process Version 6 cpio format
+			 */
+			frmt = &(fsub[F_OCPIO]);
+			break;
+		case '?':
+		default:
+			if (opterr == 0) {
+				paxwarn(1, "need -i or -o or -p option first");
+			}
+			cpio_usage();
+			break;
 		}
+		if (opterr == 0) {
+			optstr = "6AaBbC:cdE:F:fH:I:iJjkLlM:mO:oprSstuVvZz";
+			opterr = 1;
+		}
+	}
 	argc -= optind;
 	argv += optind;
 
@@ -1339,42 +1431,42 @@ cpio_options(int argc, char **argv)
 	 * process the args as they are interpreted by the operation mode
 	 */
 	switch (act) {
-		case LIST:
-		case EXTRACT:
-			while (*argv != NULL)
-				if (pat_add(*argv++, NULL) < 0)
-					cpio_usage();
-			break;
-		case COPY:
-			if (*argv == NULL) {
-				paxwarn(0, "Destination directory was not supplied");
+	case LIST:
+	case EXTRACT:
+		while (*argv != NULL)
+			if (pat_add(*argv++, NULL) < 0)
 				cpio_usage();
-			}
-			dirptr = *argv;
-			if (mkpath(dirptr) < 0)
-				cpio_usage();
-			--argc;
-			++argv;
-			/* FALL THROUGH */
-		case ARCHIVE:
-		case APPND:
-			if (*argv != NULL)
-				cpio_usage();
-			/*
-			 * no read errors allowed on updates/append operation!
-			 */
-			maxflt = 0;
-			while ((str = getline(stdin)) != NULL) {
-				ftree_add(str, 0);
-			}
-			if (getline_error) {
-				paxwarn(1, "Problem while reading stdin");
-				cpio_usage();
-			}
-			break;
-		default:
+		break;
+	case COPY:
+		if (*argv == NULL) {
+			paxwarn(0, "Destination directory was not supplied");
 			cpio_usage();
-			break;
+		}
+		dirptr = *argv;
+		if (mkpath(dirptr) < 0)
+			cpio_usage();
+		--argc;
+		++argv;
+		/* FALLTHROUGH */
+	case ARCHIVE:
+	case APPND:
+		if (*argv != NULL)
+			cpio_usage();
+		/*
+		 * no read errors allowed on updates/append operation!
+		 */
+		maxflt = 0;
+		while ((str = get_line(stdin)) != NULL) {
+			ftree_add(str, 0);
+		}
+		if (get_line_error) {
+			paxwarn(1, "Problem while reading stdin");
+			cpio_usage();
+		}
+		break;
+	default:
+		cpio_usage();
+		break;
 	}
 }
 
@@ -1497,6 +1589,8 @@ opt_add(const char *str)
 			free(dstr);
 			return(-1);
 		}
+		/* parts of string going onto the OPLIST */
+		dstr = NULL;
 		*pt++ = '\0';
 		opt->name = frpt;
 		opt->value = pt;
@@ -1512,6 +1606,7 @@ opt_add(const char *str)
 		optail->fow = opt;
 		optail = opt;
 	}
+	free(dstr);
 	return(0);
 }
 
@@ -1530,84 +1625,87 @@ opt_add(const char *str)
  *	0 for an error, a positive value o.w.
  */
 
+#ifndef LONG_OFF_T
+#define OT_MAX	ULLONG_MAX
+#define strtoot	strtoull
+#else
+#define OT_MAX	ULONG_MAX
+#define strtoot	strtoul
+#endif
+
 static off_t
 str_offt(char *val)
 {
 	char *expr;
-	off_t num, t;
+	ot_type num, t;
 
-#	ifdef LONG_OFF_T
-	num = strtol(val, &expr, 0);
-	if ((num == LONG_MAX) || (num <= 0) || (expr == val))
-#	else
-	num = strtoq(val, &expr, 0);
-	if ((num == QUAD_MAX) || (num <= 0) || (expr == val))
-#	endif
-		return(0);
+	num = strtoot(val, &expr, 0);
+	if ((num == OT_MAX) || (num <= 0) || (expr == val))
+		return (0);
 
 	switch (*expr) {
 	case 'b':
 		t = num;
 		num *= 512;
 		if (t > num)
-			return(0);
+			return (0);
 		++expr;
 		break;
 	case 'k':
 		t = num;
 		num *= 1024;
 		if (t > num)
-			return(0);
+			return (0);
 		++expr;
 		break;
 	case 'm':
 		t = num;
 		num *= 1048576;
 		if (t > num)
-			return(0);
+			return (0);
 		++expr;
 		break;
 	case 'w':
 		t = num;
 		num *= sizeof(int);
 		if (t > num)
-			return(0);
+			return (0);
 		++expr;
 		break;
 	}
 
 	switch (*expr) {
-		case '\0':
-			break;
-		case '*':
-		case 'x':
-			t = num;
-			num *= str_offt(expr + 1);
-			if (t > num)
-				return(0);
-			break;
-		default:
-			return(0);
+	case '\0':
+		break;
+	case '*':
+	case 'x':
+		t = num;
+		num *= str_offt(expr + 1);
+		if (t > num)
+			return (0);
+		break;
+	default:
+		return (0);
 	}
-	return(num);
+	return ((off_t)num);
 }
 
 char *
-getline(FILE *f)
+get_line(FILE *f)
 {
 	char *name, *temp;
 	size_t len;
 
 	name = fgetln(f, &len);
 	if (!name) {
-		getline_error = ferror(f) ? GETLINE_FILE_CORRUPT : 0;
+		get_line_error = ferror(f) ? GET_LINE_FILE_CORRUPT : 0;
 		return(0);
 	}
 	if (name[len-1] != '\n')
 		len++;
 	temp = malloc(len);
 	if (!temp) {
-		getline_error = GETLINE_OUT_OF_MEM;
+		get_line_error = GET_LINE_OUT_OF_MEM;
 		return(0);
 	}
 	memcpy(temp, name, len-1);
@@ -1628,6 +1726,12 @@ no_op(void)
 	return(0);
 }
 
+static int
+no_op_i(int is_app __attribute__((__unused__)))
+{
+	return(0);
+}
+
 /*
  * pax_usage()
  *	print the usage summary to the user
@@ -1637,16 +1741,16 @@ void
 pax_usage(void)
 {
 	(void)fputs(
-	    "usage: pax [-0cdnOvz] [-E limit] [-f archive] [-G group] [-s replstr]\n"
-	    "\t  [-T range] [-U user] [pattern ...]\n"
-	    "       pax -r [-0cDdiknOuvYZz] [-E limit] [-f archive] [-G group]\n"
-	    "\t  [-o options] [-p string] [-s replstr] [-T range]\n"
-	    "\t  [-U user] [pattern ...]\n"
-	    "       pax -w [-0adHiLOPtuvXz] [-B bytes] [-b blocksize] [-f archive]\n"
-	    "\t  [-G group] [-M flag] [-o options] [-s replstr]\n"
-	    "\t  [-T range] [-U user] [-x format] [file ...]\n"
+	    "usage: pax [-0cdJjnOvz] [-E limit] [-f archive] [-G group] [-s replstr]\n"
+	    "           [-T range] [-U user] [pattern ...]\n"
+	    "       pax -r [-0cDdiJjknOuvYZz] [-E limit] [-f archive] [-G group] [-M flag]\n"
+	    "           [-o options] [-p string] [-s replstr] [-T range] [-U user]\n"
+	    "           [pattern ...]\n"
+	    "       pax -w [-0adHiJjLOPtuvXz] [-B bytes] [-b blocksize] [-f archive]\n"
+	    "           [-G group] [-M flag] [-o options] [-s replstr] [-T range]\n"
+	    "           [-U user] [-x format] [file ...]\n"
 	    "       pax -rw [-0DdHikLlnOPtuvXYZ] [-G group] [-p string] [-s replstr]\n"
-	    "\t  [-T range] [-U user] [file ...] directory\n",
+	    "           [-T range] [-U user] [file ...] directory\n",
 	    stderr);
 	exit(1);
 }
@@ -1660,11 +1764,12 @@ void
 tar_usage(void)
 {
 	(void)fputs(
-	    "usage: tar {crtux}[014578befHhLmOoPpqRSsvwXZz]\n"
-	    "\t  [blocking-factor | archive | replstr] [-C directory] [-I file]\n"
-	    "\t  [file ...]\n"
-	    "       tar {-crtux} [-014578eHhLmOoPpqRSvwXZz] [-b blocking-factor] [-M flag]\n"
-	    "\t  [-C directory] [-f archive] [-I file] [-s replstr] [file ...]\n",
+	    "usage: tar {crtux}[014578AbefHhJjLmNOoPpqRSsvwXZz]\n"
+	    "           [blocking-factor | archive | replstr] [-C directory] [-I file]\n"
+	    "           [file ...]\n"
+	    "       tar {-crtux} [-014578AeHhJjLmNOoPpqRSvwXZz] [-b blocking-factor]\n"
+	    "           [-C directory] [-f archive] [-I file] [-M flag] [-s replstr]\n"
+	    "           [file ...]\n",
 	    stderr);
 	exit(1);
 }
@@ -1677,11 +1782,13 @@ tar_usage(void)
 void
 cpio_usage(void)
 {
-	(void)fputs("usage: cpio -o [-AaBcLvZz] [-C bytes] [-F archive] [-H format]\n", stderr);
-	(void)fputs("               [-M flag] [-O archive] <name-list [>archive]\n", stderr);
-	(void)fputs("       cpio -i [-6BbcdfmrSstuvZz] [-C bytes] [-E file] [-F archive]\n", stderr);
-	(void)fputs("               [-H format] [-I archive] [pattern...] [<archive]\n", stderr);
-	(void)fputs("       cpio -p [-adLlmuv] destination-directory <name-list\n", stderr);
+	(void)fputs(
+	    "usage: cpio -o [-AaBcJjLVvZz] [-C bytes] [-F archive] [-H format]\n"
+	    "               [-M flag] [-O archive] <name-list [>archive]\n"
+	    "       cpio -i [-6BbcdfJjmrSstuVvZz] [-C bytes] [-E file] [-F archive]\n"
+	    "               [-H format] [-I archive] [-M flag] [pattern ...] [<archive]\n"
+	    "       cpio -p [-adLlmuVv] destination-directory <name-list\n",
+	    stderr);
 	exit(1);
 }
 
@@ -1734,19 +1841,25 @@ process_M(const char *arg, void (*call_usage)(void))
 	} else if (!strncmp(arg, "link", 4)) {
 		k = ANON_HARDLINKS;
 	} else if (!strncmp(arg, "norm", 4)) {
-		k = ANON_UIDGID | ANON_INODES
-		    | ANON_MTIME | ANON_HARDLINKS;
+		k = ANON_UIDGID | ANON_INODES | ANON_NUMID |
+		    ANON_MTIME | ANON_HARDLINKS;
 	} else if (!strncmp(arg, "root", 4)) {
-		k = ANON_UIDGID | ANON_INODES;
+		k = ANON_UIDGID | ANON_INODES | ANON_NUMID;
 	} else if (!strncmp(arg, "dist", 4)) {
-		k = ANON_UIDGID | ANON_INODES
-		    | ANON_HARDLINKS;
+		k = ANON_UIDGID | ANON_INODES | ANON_NUMID |
+		    ANON_HARDLINKS;
 	} else if (!strncmp(arg, "set", 3)) {
 		k = ANON_INODES | ANON_HARDLINKS;
 	} else if (!strncmp(arg, "v", 1)) {
 		k = ANON_VERBOSE;
 	} else if (!strncmp(arg, "debug", 5)) {
 		k = ANON_DEBUG;
+	} else if (!strncmp(arg, "lncp", 4)) {
+		k = ANON_LNCP;
+	} else if (!strncmp(arg, "numid", 5)) {
+		k = ANON_NUMID;
+	} else if (!strncmp(arg, "gslash", 6)) {
+		k = ANON_DIRSLASH;
 	} else
 		call_usage();
 	if (j)
