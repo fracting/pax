@@ -1,4 +1,4 @@
-# $MirOS: pax/debian/control,v 1.13 2012/02/27 22:50:32 tg Exp $
+# $MirOS: pax/debian/control,v 1.14 2012/02/27 22:52:04 tg Exp $
 #
 Source: pax
 Section: utils
@@ -32,3 +32,4 @@ Description: Portable Archive Interchange (cpio, pax, tar)
  the mtime to zero, and producing GNU tar compatible trailing
  slashes on ustar directory nodes. Its "ar" format is suitable
  for operating on *.deb files, unlike that of GNU binutils.
+ Note that ACLs and Extended Attributes are not supported.
