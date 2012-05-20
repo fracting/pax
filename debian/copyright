@@ -1,10 +1,10 @@
 This package was debianised by Thorsten Glaser <tg@mirbsd.de> on
 Sat, 06 Sep 2008 21:25:34 +0000.
 
-$MirOS: pax/debian/copyright,v 1.5 2012/02/16 18:02:24 tg Exp $
+$MirOS: pax/debian/copyright,v 1.6 2012/05/20 17:50:59 tg Exp $
 
 It was downloaded from:
-https://www.mirbsd.org/MirOS/dist/mir/cpio/paxmirabilis-20120216.cpio.gz
+https://www.mirbsd.org/MirOS/dist/mir/cpio/paxmirabilis-20120520.cpio.gz
 
 Licence:
 
