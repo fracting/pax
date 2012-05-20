@@ -5,8 +5,10 @@ pax (1:20120520-1) unstable; urgency=low
       utility auto-detection, based on archive filename
     - includes options.c change (drop Debian patch)
   * Mention member size limitations on !kfreebsd !LP64 platforms
+    due to an eglibc bug (#317466)
+  * Override lintian false-positive "hardening-no-stackprotector"
 
- -- Thorsten Glaser <tg@mirbsd.de>  Sun, 20 May 2012 17:50:42 +0000
+ -- Thorsten Glaser <tg@mirbsd.de>  Sun, 20 May 2012 18:00:53 +0000
 
 pax (1:20120216-2) unstable; urgency=low
 
