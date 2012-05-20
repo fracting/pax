@@ -1,4 +1,8 @@
-# $MirOS: pax/debian/lintian/pax,v 1.1 2012/05/20 18:01:19 tg Exp $
+# $MirOS: pax/debian/lintian/pax,v 1.2 2012/05/20 18:05:34 tg Exp $
 
 # false positive, see build logs, it _is_ beink built with SSP
 pax: hardening-no-stackprotector bin/pax
+
+# there are indeed none, no need to warn about it
+pax: no-homepage-field
+pax: no-upstream-changelog

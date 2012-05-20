@@ -7,8 +7,9 @@ pax (1:20120520-1) unstable; urgency=low
   * Mention member size limitations on !kfreebsd !LP64 platforms
     due to an eglibc bug (#317466)
   * Override lintian false-positive "hardening-no-stackprotector"
+  * Add overrides for "yes, not an omission, there are none"
 
- -- Thorsten Glaser <tg@mirbsd.de>  Sun, 20 May 2012 18:00:53 +0000
+ -- Thorsten Glaser <tg@mirbsd.de>  Sun, 20 May 2012 18:05:19 +0000
 
 pax (1:20120216-2) unstable; urgency=low
 
