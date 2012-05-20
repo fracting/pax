@@ -48,6 +48,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <time.h>
 #include <err.h>
 #include "pax.h"
 #include "options.h"
@@ -57,7 +58,7 @@
 #include <sys/mtio.h>
 #endif
 
-__RCSID("$MirOS: src/bin/pax/ar_io.c,v 1.14 2012/02/16 17:27:30 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/ar_io.c,v 1.17 2012/05/20 17:21:44 tg Exp $");
 
 /*
  * Routines which deal directly with the archive I/O device/file.
@@ -877,9 +878,9 @@ ar_rev(off_t sksz)
 {
 	off_t cpos;
 #if HAS_TAPE
+	int phyblk;
 	struct mtop mb;
 #endif
-	int phyblk;
 
 	/*
 	 * make sure we do not have try to reverse on a flawed archive
@@ -1274,6 +1275,10 @@ ar_start_compress(int fd, int wr)
 {
 	int fds[2];
 	const char *compress_flags;
+
+	guess_compress_program(wr);
+	if (compress_program == NULL)
+		return;
 
 	if (pipe(fds) < 0)
 		err(1, "could not pipe");
