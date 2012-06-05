@@ -1,11 +1,10 @@
 #!/usr/bin/make -f
-# $MirOS: pax/debian/rules,v 1.14 2012/02/27 22:54:38 tg Exp $
+# $MirOS: pax/debian/rules,v 1.15 2012/06/05 19:56:04 tg Exp $
 
 DEB_HOST_ARCH_OS=$(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
 CC?=			gcc
 EXTRA_CFLAGS=		-Wall -Wextra -Wformat -fno-strict-aliasing
-EXTRA_CPPFLAGS=		-DUSE_LIBBSD
 EXTRA_LDFLAGS=		-Wl,--as-needed
 
 ifneq (kfreebsd,${DEB_HOST_ARCH_OS})
@@ -27,8 +26,6 @@ CPPFLAGS+=		${EXTRA_CPPFLAGS}
 LDFLAGS+=		${EXTRA_LDFLAGS}
 endif
 
-LDADD+=			-lbsd
-
 build build-arch: debian/.build_stamp
 build-indep:
 
@@ -40,7 +37,7 @@ debian/.build_stamp:
 		${CC} ${CPPFLAGS} ${CFLAGS} $$opts ${LDFLAGS} -o pax ar.c \
 		    ar_io.c ar_subs.c buf_subs.c cache.c cpio.c file_subs.c \
 		    ftree.c gen_subs.c getoldopt.c options.c pat_rep.c pax.c \
-		    sel_subs.c tables.c tar.c tty_subs.c ${LDADD}; \
+		    sel_subs.c tables.c tar.c tty_subs.c; \
 		test -x pax && exit 0; \
 	done; echo >&2 Compiling failed.; exit 1
 	echo .nr g 2 | cat - cpio.1 >debian/paxcpio.1
