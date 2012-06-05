@@ -1,3 +1,16 @@
+pax (1:20120605-1) xunstable; urgency=low
+
+  * New upstream version
+    - merge fixes from OpenBSD
+    - improve portability
+    - remove use of stdio in favour of syscalls in some places
+    - mention nōn-support (TOOD) of pax file format in manpages
+  * Drop lintian overrides
+    - false positive is resolved
+    - we don’t really care about no-homepage and no-upstream-changelog
+
+ -- Thorsten Glaser <tg@mirbsd.de>  Tue, 05 Jun 2012 19:42:23 +0000
+
 pax (1:20120520-1) unstable; urgency=low
 
   * New upstream version

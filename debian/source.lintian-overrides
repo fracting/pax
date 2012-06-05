@@ -1,5 +1,0 @@
-# $MirOS: pax/debian/source.lintian-overrides,v 1.2 2012/05/20 17:50:59 tg Exp $
-
-# desired method of keeping changes is CVS
-# as long as etch backports are required
-#pax source: direct-changes-in-diff-but-no-patch-system *
