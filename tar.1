@@ -1,4 +1,4 @@
-.\"	$MirOS: src/bin/pax/tar.1,v 1.23 2012/05/20 17:21:45 tg Exp $
+.\"	$MirOS: src/bin/pax/tar.1,v 1.26 2012/06/05 19:29:34 tg Exp $
 .\"	$OpenBSD: tar.1,v 1.55 2010/12/02 04:08:27 tedu Exp $
 .\"
 .\" Copyright (c) 2005, 2008, 2009, 2011, 2012
@@ -34,6 +34,8 @@
 .\" * ~ is size-reduced and placed atop in groff, so use \*(TI
 .\" * ^ is size-reduced and placed atop in groff, so use \*(ha
 .\" * \(en does not work in nroff, so use \*(en
+.\" * <>| are problematic, so redefine and use \*(Lt\*(Gt\*(Ba
+.\" Also make sure to use \& especially with two-letter words.
 .\" The section after the "doc" macropackage has been loaded contains
 .\" additional code to convene between the UCB mdoc macropackage (and
 .\" its variant as BSD mdoc in groff) and the GNU mdoc macropackage.
@@ -78,11 +80,13 @@
 .\" with -mandoc, it might implement .Mx itself, but we want to
 .\" use our own definition. And .Dd must come *first*, always.
 .\"
-.Dd $Mdocdate: May 20 2012 $
+.Dd $Mdocdate: June 5 2012 $
 .\"
-.\" Check which macro package we use
+.\" Check which macro package we use, and do other -mdoc setup.
 .\"
 .ie \n(.g \{\
+.	if \*[.T]utf8 .tr \[la]\*(Lt
+.	if \*[.T]utf8 .tr \[ra]\*(Gt
 .	ie d volume-ds-1 .ds tT gnu
 .	el .ds tT bsd
 .\}
@@ -191,7 +195,7 @@
 .No { Cm crtux No } Op Cm 014578AabefHhJjLmNOoPRSpqsvwXZz
 .Sm on
 .Bk -words
-.Op Ar blocking-factor | archive | replstr
+.Op Ar blocking-factor \*(Ba archive \*(Ba replstr
 .Op Fl C Ar directory
 .Op Fl I Ar file
 .Op Ar
@@ -294,7 +298,7 @@ This option only exists for semi-compatibility with
 it is strongly recommended to archive to stdout and pipe into
 an external compression utility with appropriate arguments instead:
 .Pp
-.Dl tar -cf - foo \*(Ba xz -2e \*(Gtfoo.txz
+.Dl tar \-cf \- foo \*(Ba xz \-2e \*(Gtfoo.txz
 .It Fl b Ar blocking-factor
 Set blocking factor to use for the archive.
 .Nm
@@ -646,3 +650,7 @@ The flags
 are not portable to other implementations of
 .Nm tar
 where they may have a different meaning or not exist at all.
+.Sh BUGS
+The
+.Ar pax
+file format is not yet supported.
