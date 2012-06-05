@@ -1,11 +1,21 @@
 #!/usr/bin/make -f
-# $MirOS: pax/debian/rules,v 1.16 2012/06/05 20:56:10 tg Exp $
+# $MirOS: pax/debian/rules,v 1.17 2012/06/05 21:23:27 tg Exp $
 
 DEB_BUILD_ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 DEB_HOST_ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
 DEB_HOST_ARCH_OS=$(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+DEB_HOST_GNU_TYPE=$(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 
-CC?=			gcc
+# is ${CC} defined anywhere (other than implicit rules?)
+ifneq (,$(findstring $(origin CC),default undefined))
+# no - then default to gcc (or cross-gcc)
+ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
+CC=			${DEB_HOST_GNU_TYPE}-gcc
+else
+CC=			gcc
+endif
+endif
+
 EXTRA_CFLAGS=		-Wall -Wextra -Wformat -fno-strict-aliasing
 EXTRA_LDFLAGS=		-Wl,--as-needed
 
@@ -32,6 +42,7 @@ build build-arch: debian/.build_stamp
 build-indep:
 
 debian/.build_stamp:
+	# goodbye dh_testdir
 	test -f tty_subs.c
 	test -x debian/rules
 	-rm -rf debian/.build_stamp debian/pax
@@ -43,8 +54,11 @@ debian/.build_stamp:
 		    sel_subs.c tables.c tar.c tty_subs.c; \
 		test -x pax && exit 0; \
 	done; echo >&2 Compiling failed.; exit 1
+	# goodbye dh_installdirs
 	mkdir -p debian/pax/bin debian/pax/usr/share/man/man1
+	# goodbye dh_install
 	mv pax debian/pax/bin/
+	# goodbye dh_link
 	ln -s pax debian/pax/bin/paxcpio
 	ln -s pax debian/pax/bin/paxtar
 	echo .nr g 2 | cat - cpio.1 | \
@@ -56,30 +70,41 @@ debian/.build_stamp:
 	@:>$@
 
 clean:
+	# goodbye dh_testdir
 	test -f tty_subs.c
 	test -x debian/rules
 ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
+	# goodbye dh_testroot
 	test 0 = "$$(id -u)"
 endif
 	-rm -rf debian/.build_stamp debian/pax dst
+	# goodbye dh_clean
 	-rm -f debian/files debian/substvars
 
 binary-indep: build-indep
 
 binary-arch: build-arch
+	# goodbye dh_testdir
 	test -f tty_subs.c
 	test -x debian/rules
 ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
 	# needs (fake)root when cross-compiling
+	# goodbye dh_testroot
 	test 0 = "$$(id -u)"
 endif
+	# goodbye dh_prep
+	-rm -f debian/files debian/substvars
+	# goodbye dh_installdocs
 	mkdir -p debian/pax/usr/share/doc/pax
 	cp debian/copyright debian/pax/usr/share/doc/pax/copyright
+	# goodbye dh_installchangelogs
 	gzip -n9 <debian/changelog \
 	    >debian/pax/usr/share/doc/pax/changelog.Debian.gz
+	# goodbye dh_strip
 ifeq (,$(findstring nostrip,${DEB_BUILD_OPTIONS}))
 	strip -s -R .note -R .comment debian/pax/bin/pax
 endif
+	# goodbye dh_fixperms
 ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
 	chown -R 0:0 debian/pax
 endif
@@ -87,15 +112,19 @@ endif
 	    debian/pax/bin/pax
 	chmod 644 debian/pax/usr/share/doc/pax/* \
 	    debian/pax/usr/share/man/man1/*
+	# goodbye dh_installdeb
 	rm -rf dst
 	mkdir -p debian/pax/DEBIAN dst/c
-	-rm -f debian/files debian/substvars
+	# goodbye dh_shlibdeps
 	dpkg-shlibdeps -edebian/pax/bin/pax
+	# goodbye dh_gencontrol
 	dpkg-gencontrol -ppax -Pdebian/pax -isp
 	mv debian/pax/DEBIAN/control dst/c/
 	rm -rf debian/pax/DEBIAN
+	# goodbye dh_md5sums
 	(cd debian/pax && find . -type f | sed s,^./,, | sort | \
 	    xargs md5sum) >dst/c/md5sums
+	# goodbye dh_builddeb
 ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
 	mv dst/c debian/pax/DEBIAN
 	dpkg-deb -b debian/pax ..

@@ -9,9 +9,10 @@ pax (1:20120605-1) unstable; urgency=low
   * Drop lintian overrides
     - false positive is resolved
     - we don’t really care about no-homepage and no-upstream-changelog
-  * Build-Depends less package! Thanks to “goodbye”!
+  * Build-Depends less package! Thanks to “goodbye” sample package!
+  * Aid cross-compiling by setting ${CC} to something useful
 
- -- Thorsten Glaser <tg@mirbsd.de>  Tue, 05 Jun 2012 19:42:23 +0000
+ -- Thorsten Glaser <tg@mirbsd.de>  Tue, 05 Jun 2012 21:23:06 +0000
 
 pax (1:20120520-1) unstable; urgency=low
 
