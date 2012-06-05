@@ -1,6 +1,7 @@
-pax (1:20120605-1) xunstable; urgency=low
+pax (1:20120605-1) unstable; urgency=low
 
-  * New upstream version
+  * The “Sport ist Mord” upload
+  * Update to new upstream version:
     - merge fixes from OpenBSD
     - improve portability
     - remove use of stdio in favour of syscalls in some places
@@ -8,7 +9,7 @@ pax (1:20120605-1) xunstable; urgency=low
   * Drop lintian overrides
     - false positive is resolved
     - we don’t really care about no-homepage and no-upstream-changelog
-  * Drop no longer needed build dependency on libbsd-dev
+  * Build-Depends less package! Thanks to “goodbye”!
 
  -- Thorsten Glaser <tg@mirbsd.de>  Tue, 05 Jun 2012 19:42:23 +0000
 
