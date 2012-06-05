@@ -1,3 +1,12 @@
+pax (1:20120606-1) unstable; urgency=low
+
+  * The “How the … did I get sore s̲h̲o̲u̲l̲d̲e̲r̲ muscles from football?” upload
+  * Update to new upstream version:
+    - oops, fix tty_init rewrito
+  * This fixes FTBFS
+
+ -- Thorsten Glaser <tg@mirbsd.de>  Wed, 06 Jun 2012 00:49:57 +0200
+
 pax (1:20120605-1) unstable; urgency=low
 
   * The “Sport ist Mord” upload
