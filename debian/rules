@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# $MirOS: pax/debian/rules,v 1.19 2012/06/07 00:08:01 tg Exp $
+# $MirOS: pax/debian/rules,v 1.20 2012/06/07 00:27:08 tg Exp $
 
 DEB_BUILD_ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 DEB_HOST_ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
@@ -63,7 +63,8 @@ ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
 	# goodbye dh_testroot
 	test 0 = "$$(id -u)"
 endif
-	-rm -rf debian/.build_stamp debian/pax dst
+	-rm -f pax
+	-rm -rf debian/.*_stamp debian/B debian/pax
 	# goodbye dh_clean
 	-rm -f debian/files debian/substvars
 
@@ -82,7 +83,8 @@ endif
 	-rm -f debian/files debian/substvars
 	# goodbye dh_installdirs
 	-rm -rf debian/pax
-	mkdir -p debian/pax/bin debian/pax/usr/share/doc/pax debian/pax/usr/share/man/man1
+	mkdir -p debian/pax/bin debian/pax/usr/share/doc/pax \
+	    debian/pax/usr/share/man/man1
 	# goodbye dh_installchangelogs
 	cp -a debian/changelog debian/pax/usr/share/doc/pax/changelog.Debian
 	gzip -n9 debian/pax/usr/share/doc/pax/changelog.Debian
@@ -112,32 +114,32 @@ endif
 	chmod 755 $$(find debian/pax -type d) \
 	    debian/pax/bin/pax
 	# goodbye dh_installdeb
-	rm -rf dst
-	mkdir -p debian/pax/DEBIAN dst/c
+	-rm -rf debian/B
+	mkdir -p debian/pax/DEBIAN debian/B/c
 	# goodbye dh_shlibdeps
 	dpkg-shlibdeps -edebian/pax/bin/pax
 	# goodbye dh_gencontrol
 	dpkg-gencontrol -ppax -Pdebian/pax -isp
-	mv debian/pax/DEBIAN/control dst/c/
+	mv debian/pax/DEBIAN/control debian/B/c/
 	rm -rf debian/pax/DEBIAN
 	# goodbye dh_md5sums
 	(cd debian/pax && find . -type f | sed s,^./,, | sort | \
-	    xargs md5sum) >dst/c/md5sums
+	    xargs md5sum) >debian/B/c/md5sums
 	# goodbye dh_builddeb
 ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
-	mv dst/c debian/pax/DEBIAN
+	mv debian/B/c debian/pax/DEBIAN
 	dpkg-deb -b debian/pax ..
 else
-	(cd debian/pax && find . | sort | ../../debian/pax/bin/paxcpio \
+	(cd debian/pax && find . | sort | ./bin/paxcpio \
 	    -oC512 -Hustar -Minodes -Mlinks -Muidgid -Mgslash) | \
-	    gzip -n9 >dst/data.tar.gz
-	cd dst/c && chmod 644 *
-	(cd dst/c && find . | sort | ../../debian/pax/bin/paxcpio \
+	    gzip -n9 >debian/B/data.tar.gz
+	cd debian/B/c && chmod 644 *
+	(cd debian/B/c && find . | sort | ../../pax/bin/paxcpio \
 	    -oC512 -Hustar -Minodes -Mlinks -Muidgid -Mgslash) | \
-	    gzip -n9 >dst/control.tar.gz
-	echo 2.0 >dst/debian-binary
-	read fn rest <debian/files && cd dst && \
-	    ../debian/pax/bin/paxtar -A -M dist -cf "../../$$fn" \
+	    gzip -n9 >debian/B/control.tar.gz
+	echo 2.0 >debian/B/debian-binary
+	read fn rest <debian/files && cd debian/B && \
+	    ../pax/bin/paxtar -A -M dist -cf "../../../$$fn" \
 	    debian-binary control.tar.gz data.tar.gz
 endif
 

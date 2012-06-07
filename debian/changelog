@@ -2,7 +2,7 @@ pax (1:20120606-2) xunstable; urgency=low
 
   * Fix permissions, timestamps, and shuffle dh_* around
 
- -- Thorsten Glaser <tg@mirbsd.de>  Thu, 07 Jun 2012 00:07:37 +0000
+ -- Thorsten Glaser <tg@mirbsd.de>  Thu, 07 Jun 2012 00:26:49 +0000
 
 pax (1:20120606-1) unstable; urgency=low
 
