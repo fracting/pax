@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# $MirOS: pax/debian/rules,v 1.18 2012/06/07 00:02:17 tg Exp $
+# $MirOS: pax/debian/rules,v 1.19 2012/06/07 00:08:01 tg Exp $
 
 DEB_BUILD_ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 DEB_HOST_ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
@@ -84,8 +84,8 @@ endif
 	-rm -rf debian/pax
 	mkdir -p debian/pax/bin debian/pax/usr/share/doc/pax debian/pax/usr/share/man/man1
 	# goodbye dh_installchangelogs
-	gzip -n9 <debian/changelog \
-	    >debian/pax/usr/share/doc/pax/changelog.Debian.gz
+	cp -a debian/changelog debian/pax/usr/share/doc/pax/changelog.Debian
+	gzip -n9 debian/pax/usr/share/doc/pax/changelog.Debian
 	# goodbye dh_installdocs
 	cp -a debian/copyright debian/pax/usr/share/doc/pax/copyright
 	# goodbye dh_install
