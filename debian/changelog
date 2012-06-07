@@ -1,3 +1,9 @@
+pax (1:20120606-2) xunstable; urgency=low
+
+  * Fix permissions and shuffle dh_* around
+
+ -- Thorsten Glaser <tg@mirbsd.de>  Thu, 07 Jun 2012 00:01:38 +0000
+
 pax (1:20120606-1) unstable; urgency=low
 
   * The “How the … did I get sore s̲h̲o̲u̲l̲d̲e̲r̲ muscles from football?” upload

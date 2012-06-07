@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# $MirOS: pax/debian/rules,v 1.17 2012/06/05 21:23:27 tg Exp $
+# $MirOS: pax/debian/rules,v 1.18 2012/06/07 00:02:17 tg Exp $
 
 DEB_BUILD_ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 DEB_HOST_ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
@@ -45,7 +45,6 @@ debian/.build_stamp:
 	# goodbye dh_testdir
 	test -f tty_subs.c
 	test -x debian/rules
-	-rm -rf debian/.build_stamp debian/pax
 	+for opts in '-flto=jobserver' '-fwhole-program --combine' ''; do \
 		set -x; \
 		${CC} ${CPPFLAGS} ${CFLAGS} $$opts ${LDFLAGS} -o pax ar.c \
@@ -54,19 +53,6 @@ debian/.build_stamp:
 		    sel_subs.c tables.c tar.c tty_subs.c; \
 		test -x pax && exit 0; \
 	done; echo >&2 Compiling failed.; exit 1
-	# goodbye dh_installdirs
-	mkdir -p debian/pax/bin debian/pax/usr/share/man/man1
-	# goodbye dh_install
-	mv pax debian/pax/bin/
-	# goodbye dh_link
-	ln -s pax debian/pax/bin/paxcpio
-	ln -s pax debian/pax/bin/paxtar
-	echo .nr g 2 | cat - cpio.1 | \
-	    gzip -n9 >debian/pax/usr/share/man/man1/paxcpio.1.gz
-	echo .nr g 2 | cat - pax.1 | \
-	    gzip -n9 >debian/pax/usr/share/man/man1/pax.1.gz
-	echo .nr g 2 | cat - tar.1 | \
-	    gzip -n9 >debian/pax/usr/share/man/man1/paxtar.1.gz
 	@:>$@
 
 clean:
@@ -94,12 +80,26 @@ ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
 endif
 	# goodbye dh_prep
 	-rm -f debian/files debian/substvars
-	# goodbye dh_installdocs
-	mkdir -p debian/pax/usr/share/doc/pax
-	cp debian/copyright debian/pax/usr/share/doc/pax/copyright
+	# goodbye dh_installdirs
+	-rm -rf debian/pax
+	mkdir -p debian/pax/bin debian/pax/usr/share/doc/pax debian/pax/usr/share/man/man1
 	# goodbye dh_installchangelogs
 	gzip -n9 <debian/changelog \
 	    >debian/pax/usr/share/doc/pax/changelog.Debian.gz
+	# goodbye dh_installdocs
+	cp -a debian/copyright debian/pax/usr/share/doc/pax/copyright
+	# goodbye dh_install
+	cp pax debian/pax/bin/
+	# goodbye dh_installman
+	echo .nr g 2 | cat - cpio.1 | \
+	    gzip -n9 >debian/pax/usr/share/man/man1/paxcpio.1.gz
+	echo .nr g 2 | cat - pax.1 | \
+	    gzip -n9 >debian/pax/usr/share/man/man1/pax.1.gz
+	echo .nr g 2 | cat - tar.1 | \
+	    gzip -n9 >debian/pax/usr/share/man/man1/paxtar.1.gz
+	# goodbye dh_link
+	ln -s pax debian/pax/bin/paxcpio
+	ln -s pax debian/pax/bin/paxtar
 	# goodbye dh_strip
 ifeq (,$(findstring nostrip,${DEB_BUILD_OPTIONS}))
 	strip -s -R .note -R .comment debian/pax/bin/pax
@@ -108,10 +108,9 @@ endif
 ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
 	chown -R 0:0 debian/pax
 endif
+	chmod 644 $$(find debian/pax -type f)
 	chmod 755 $$(find debian/pax -type d) \
 	    debian/pax/bin/pax
-	chmod 644 debian/pax/usr/share/doc/pax/* \
-	    debian/pax/usr/share/man/man1/*
 	# goodbye dh_installdeb
 	rm -rf dst
 	mkdir -p debian/pax/DEBIAN dst/c
@@ -132,6 +131,7 @@ else
 	(cd debian/pax && find . | sort | ../../debian/pax/bin/paxcpio \
 	    -oC512 -Hustar -Minodes -Mlinks -Muidgid -Mgslash) | \
 	    gzip -n9 >dst/data.tar.gz
+	cd dst/c && chmod 644 *
 	(cd dst/c && find . | sort | ../../debian/pax/bin/paxcpio \
 	    -oC512 -Hustar -Minodes -Mlinks -Muidgid -Mgslash) | \
 	    gzip -n9 >dst/control.tar.gz
