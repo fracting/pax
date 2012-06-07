@@ -1,8 +1,10 @@
-pax (1:20120606-2) xunstable; urgency=low
+pax (1:20120606-2) unstable; urgency=low
 
   * Fix permissions, timestamps, and shuffle dh_* around
+  * Switch to 3.0 (quilt)
+  * Temporarily add a versioned B-C for fakeroot on hurd (#676428)
 
- -- Thorsten Glaser <tg@mirbsd.de>  Thu, 07 Jun 2012 00:26:49 +0000
+ -- Thorsten Glaser <tg@mirbsd.de>  Thu, 07 Jun 2012 00:37:12 +0000
 
 pax (1:20120606-1) unstable; urgency=low
 
