@@ -1,8 +1,9 @@
 pax (1:20120606-3) xunstable; urgency=low
 
   * Drop temporary B-C for fakeroot on hurd again
+  * debian/watch: mangle the epoch away so DDPO is green again
 
- -- Thorsten Glaser <tg@mirbsd.de>  Fri, 29 Jun 2012 21:30:11 +0000
+ -- Thorsten Glaser <tg@mirbsd.de>  Sat, 29 Sep 2012 14:38:21 +0000
 
 pax (1:20120606-2) unstable; urgency=low
 
