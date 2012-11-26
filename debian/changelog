@@ -1,9 +1,12 @@
-pax (1:20120606-3) xunstable; urgency=low
+pax (1:20120606-3) experimental; urgency=low
 
+  * “Our littlest” upload
+  * Policy 3.9.4.0, with no relevant changes
   * Drop temporary B-C for fakeroot on hurd again
   * debian/watch: mangle the epoch away so DDPO is green again
+  * Completely rewrite packaging using debhelper (Closes: #690381)
 
- -- Thorsten Glaser <tg@mirbsd.de>  Sat, 29 Sep 2012 14:38:21 +0000
+ -- Thorsten Glaser <tg@mirbsd.de>  Mon, 26 Nov 2012 17:01:37 +0000
 
 pax (1:20120606-2) unstable; urgency=low
 
