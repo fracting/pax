@@ -1,10 +1,11 @@
-# $MirOS: pax/debian/control,v 1.20 2012/06/29 21:33:41 tg Exp $
+# $MirOS: pax/debian/control,v 1.21 2012/11/26 17:09:57 tg Exp $
 #
 Source: pax
 Section: utils
 Priority: optional
 Maintainer: Thorsten Glaser <tg@mirbsd.de>
-Standards-Version: 3.9.3
+Standards-Version: 3.9.4
+Build-Depends: debhelper (>= 5)
 # First word is the $CVSROOT (-d arg) string, second word the module.
 # Upstream is on the same server, in the "pax" module.
 Vcs-CVS: :ext:_anoncvs@anoncvs.mirbsd.org:/cvs contrib/hosted/tg/deb/mircpio
@@ -13,7 +14,7 @@ Vcs-Browser: http://cvs.mirbsd.de/contrib/hosted/tg/deb/mircpio/
 Package: pax
 Architecture: any
 Multi-Arch: foreign
-Depends: ${shlibs:Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: Portable Archive Interchange (cpio, pax, tar)
  paxtar is an implementation of an archiving utility that reads
  and writes several formats - traditional ones, the extended

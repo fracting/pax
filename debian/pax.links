@@ -1,0 +1,4 @@
+# $MirOS: pax/debian/pax.links,v 1.1 2012/11/26 17:09:58 tg Exp $
+#-
+bin/pax bin/paxcpio
+bin/pax bin/paxtar
