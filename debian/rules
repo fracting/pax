@@ -1,14 +1,28 @@
 #!/usr/bin/make -f
-# $MirOS: pax/debian/rules,v 1.23 2012/11/26 17:36:22 tg Exp $
+# $MirOS: pax/debian/rules,v 1.20.2.1 2013/01/26 17:06:45 tg Exp $
 
+DEB_BUILD_ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
+DEB_HOST_ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
 DEB_HOST_ARCH_OS=$(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+DEB_HOST_GNU_TYPE=$(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 
-CC?=			gcc
+# is ${CC} defined anywhere (other than implicit rules?)
+ifneq (,$(findstring $(origin CC),default undefined))
+# no - then default to gcc (or cross-gcc)
+ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
+CC=			${DEB_HOST_GNU_TYPE}-gcc
+else
+CC=			gcc
+endif
+endif
+
 EXTRA_CFLAGS=		-Wall -Wextra -Wformat -fno-strict-aliasing
 EXTRA_LDFLAGS=		-Wl,--as-needed
 
 ifneq (kfreebsd,${DEB_HOST_ARCH_OS})
+ifneq (x32,${DEB_HOST_ARCH})
 EXTRA_CPPFLAGS+=	-DLONG_OFF_T
+endif
 endif
 
 ifneq (,$(wildcard /usr/share/dpkg/buildflags.mk))
@@ -26,12 +40,13 @@ CPPFLAGS+=		${EXTRA_CPPFLAGS}
 LDFLAGS+=		${EXTRA_LDFLAGS}
 endif
 
-build: build-arch build-indep
-build-arch: debian/.build_stamp
+build build-arch: debian/.build_stamp
 build-indep:
 
 debian/.build_stamp:
-	dh_testdir
+	# goodbye dh_testdir
+	test -f tty_subs.c
+	test -x debian/rules
 	+for opts in '-flto=jobserver' '-fwhole-program --combine' ''; do \
 		set -x; \
 		${CC} ${CPPFLAGS} ${CFLAGS} $$opts ${LDFLAGS} -o pax ar.c \
@@ -40,37 +55,95 @@ debian/.build_stamp:
 		    sel_subs.c tables.c tar.c tty_subs.c; \
 		test -x pax && exit 0; \
 	done; echo >&2 Compiling failed.; exit 1
-	echo .nr g 2 | cat - cpio.1 >debian/paxcpio.1
-	echo .nr g 2 | cat - pax.1 >debian/pax.1
-	echo .nr g 2 | cat - tar.1 >debian/paxtar.1
 	@:>$@
 
 clean:
-	dh_testdir
-	dh_clean
-	-rm -f debian/.*_stamp \
-	    debian/paxcpio.1 debian/pax.1 debian/paxtar.1 pax
+	# goodbye dh_testdir
+	test -f tty_subs.c
+	test -x debian/rules
+ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
+	# goodbye dh_testroot
+	test 0 = "$$(id -u)"
+endif
+	-rm -f pax
+	-rm -rf debian/.*_stamp debian/B debian/pax
+	# goodbye dh_clean
+	-rm -f debian/files debian/substvars
 
 binary-indep: build-indep
 
 binary-arch: build-arch
-	dh_testdir
-	dh_testroot
-	if test -x "$$(which dh_prep)"; then dh_prep; else dh_clean -k; fi
-	dh_installchangelogs
-	dh_installdocs
-	dh_install
-	dh_installman
-	dh_link
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
+	# goodbye dh_testdir
+	test -f tty_subs.c
+	test -x debian/rules
+ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
+	# needs (fake)root when cross-compiling
+	# goodbye dh_testroot
+	test 0 = "$$(id -u)"
+endif
+	# goodbye dh_prep
+	-rm -f debian/files debian/substvars
+	# goodbye dh_installdirs
+	-rm -rf debian/pax
+	mkdir -p debian/pax/bin debian/pax/usr/share/doc/pax \
+	    debian/pax/usr/share/man/man1
+	# goodbye dh_installchangelogs
+	cp -a debian/changelog debian/pax/usr/share/doc/pax/changelog.Debian
+	gzip -n9 debian/pax/usr/share/doc/pax/changelog.Debian
+	# goodbye dh_installdocs
+	cp -a debian/copyright debian/pax/usr/share/doc/pax/copyright
+	# goodbye dh_install
+	cp pax debian/pax/bin/
+	# goodbye dh_installman
+	echo .nr g 2 | cat - cpio.1 | \
+	    gzip -n9 >debian/pax/usr/share/man/man1/paxcpio.1.gz
+	echo .nr g 2 | cat - pax.1 | \
+	    gzip -n9 >debian/pax/usr/share/man/man1/pax.1.gz
+	echo .nr g 2 | cat - tar.1 | \
+	    gzip -n9 >debian/pax/usr/share/man/man1/paxtar.1.gz
+	# goodbye dh_link
+	ln -s pax debian/pax/bin/paxcpio
+	ln -s pax debian/pax/bin/paxtar
+	# goodbye dh_strip
+ifeq (,$(findstring nostrip,${DEB_BUILD_OPTIONS}))
+	strip -s -R .note -R .comment debian/pax/bin/pax
+endif
+	# goodbye dh_fixperms
+ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
+	chown -R 0:0 debian/pax
+endif
+	chmod 644 $$(find debian/pax -type f)
+	chmod 755 $$(find debian/pax -type d) \
+	    debian/pax/bin/pax
+	# goodbye dh_installdeb
+	-rm -rf debian/B
+	mkdir -p debian/pax/DEBIAN debian/B/c
+	# goodbye dh_shlibdeps
+	dpkg-shlibdeps -edebian/pax/bin/pax
+	# goodbye dh_gencontrol
+	dpkg-gencontrol -ppax -Pdebian/pax -isp
+	mv debian/pax/DEBIAN/control debian/B/c/
+	rm -rf debian/pax/DEBIAN
+	# goodbye dh_md5sums
+	(cd debian/pax && find . -type f | sed s,^./,, | sort | \
+	    xargs md5sum) >debian/B/c/md5sums
+	# goodbye dh_builddeb
+ifneq (${DEB_BUILD_ARCH},${DEB_HOST_ARCH})
+	mv debian/B/c debian/pax/DEBIAN
+	dpkg-deb -b debian/pax ..
+else
+	(cd debian/pax && find . | sort | ./bin/paxcpio \
+	    -oC512 -Hustar -Minodes -Mlinks -Muidgid -Mgslash) | \
+	    gzip -n9 >debian/B/data.tar.gz
+	cd debian/B/c && chmod 644 *
+	(cd debian/B/c && find . | sort | ../../pax/bin/paxcpio \
+	    -oC512 -Hustar -Minodes -Mlinks -Muidgid -Mgslash) | \
+	    gzip -n9 >debian/B/control.tar.gz
+	echo 2.0 >debian/B/debian-binary
+	read fn rest <debian/files && cd debian/B && \
+	    ../pax/bin/paxtar -A -M dist -cf "../../../$$fn" \
+	    debian-binary control.tar.gz data.tar.gz
+endif
 
-binary: binary-arch binary-indep
-
+binary: binary-indep binary-arch
 .PHONY: binary binary-arch binary-indep build build-arch build-indep clean
