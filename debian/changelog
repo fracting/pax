@@ -1,3 +1,21 @@
+pax (1:20120606-4) UNRELEASED; urgency=low
+
+  * Merge 1:20120606-2+deb7u1 upload
+
+ -- Thorsten Glaser <tg@mirbsd.de>  Sat, 26 Jan 2013 17:10:14 +0000
+
+pax (1:20120606-2+deb7u1) unstable; urgency=low
+
+  * The “I know how that feels, porting” upload
+  * Apparently, x32 did the right thing and uses a 64-bit off_t
+    by default as the BSDs do, even if its long is shorter; it’s
+    the first Linux architecture to do so ⇒ needs an extra check
+  * Upload to unstable, so the x32 porting can go on; it doesn’t
+    need to migrate to wheezy in itself but this change shouldn’t
+    prevent an eventual 1:20120606-2+deb7u2 from migrating either
+
+ -- Thorsten Glaser <tg@mirbsd.de>  Sat, 26 Jan 2013 17:04:17 +0000
+
 pax (1:20120606-3) experimental; urgency=low
 
   * “Our littlest” upload
