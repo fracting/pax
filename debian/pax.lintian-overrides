@@ -1,0 +1,9 @@
+# this is due to a known bug in libc (Debian #317466)
+# yes this does not use LFS support but that's still better than crashing
+pax: binary-file-built-without-LFS-support bin/pax
+
+# there is none
+pax: no-upstream-changelog
+
+# none yet
+pax: no-homepage-field

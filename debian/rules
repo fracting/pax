@@ -87,12 +87,16 @@ endif
 	# goodbye dh_installdirs
 	-rm -rf debian/pax
 	mkdir -p debian/pax/bin debian/pax/usr/share/doc/pax \
+	    debian/pax/usr/share/lintian/overrides \
 	    debian/pax/usr/share/man/man1
 	# goodbye dh_installchangelogs
 	cp -a debian/changelog debian/pax/usr/share/doc/pax/changelog.Debian
 	gzip -n9 debian/pax/usr/share/doc/pax/changelog.Debian
 	# goodbye dh_installdocs
 	cp -a debian/copyright debian/pax/usr/share/doc/pax/copyright
+	# goodbye dh_lintian
+	cp -a debian/pax.lintian-overrides \
+	    debian/pax/usr/share/lintian/overrides/pax
 	# goodbye dh_install
 	cp pax debian/pax/bin/
 	# goodbye dh_installman
