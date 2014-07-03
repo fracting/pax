@@ -379,6 +379,10 @@ chk_ftime(ARCHD *arcn)
 	u_int indx;
 	char ckname[PAXPATHLEN+1];
 
+	if (arcn->nlen > PAXPATHLEN)
+		/*XXX just skip over this file */
+		return (-1);
+
 	/*
 	 * no info, go ahead and add to archive
 	 */

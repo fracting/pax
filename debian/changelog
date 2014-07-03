@@ -7,8 +7,9 @@ pax (1:20140703-1) unstable; urgency=medium
   * Revert intrusive, troubling packaging changes from experimental
   * New upstream version, upload to unstable
   * Address lintian’s concerns
+  * Plug some GCC fortify warnings
 
- -- Thorsten Glaser <tg@mirbsd.de>  Thu, 03 Jul 2014 23:17:25 +0200
+ -- Thorsten Glaser <tg@mirbsd.de>  Thu, 03 Jul 2014 23:23:33 +0200
 
 pax (1:20120606-3) experimental; urgency=low
 
