@@ -1,3 +1,1 @@
-# $MirOS: contrib/hosted/tg/deb/mircpio/debian/pax.install,v 1.1 2012/11/26 17:09:58 tg Exp $
-#-
 pax bin/

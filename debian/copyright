@@ -1,8 +1,6 @@
 This package was debianised by Thorsten Glaser <tg@mirbsd.de> on
 Mon, 26 Nov 2012 16:43:46 +0000.
 
-$MirOS: contrib/hosted/tg/deb/mircpio/debian/copyright,v 1.8 2012/11/26 17:09:57 tg Exp $
-
 It was downloaded from:
 https://www.mirbsd.org/MirOS/dist/mir/cpio/paxmirabilis-20120606.cpio.gz
 
