@@ -1,12 +1,13 @@
-pax (1:20120606-4) UNRELEASED; urgency=medium
+pax (1:20140703-1) unstable; urgency=medium
 
   * Merge 1:20120606-2+deb7u1 upload
   * debian/control: Move VCS-* fields to Alioth collab-maint git
   * Remove now-useless RCS IDs
   * Bump Policy to 3.9.5 (no changes needed)
   * Revert intrusive, troubling packaging changes from experimental
+  * New upstream version
 
- -- Thorsten Glaser <tg@mirbsd.de>  Thu, 03 Jul 2014 23:08:19 +0200
+ -- Thorsten Glaser <tg@mirbsd.de>  Thu, 03 Jul 2014 23:10:34 +0200
 
 pax (1:20120606-3) experimental; urgency=low
 
