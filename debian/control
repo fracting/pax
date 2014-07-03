@@ -6,10 +6,8 @@ Priority: optional
 Maintainer: Thorsten Glaser <tg@mirbsd.de>
 Standards-Version: 3.9.4
 Build-Depends: debhelper (>= 5)
-# First word is the $CVSROOT (-d arg) string, second word the module.
-# Upstream is on the same server, in the "pax" module.
-Vcs-CVS: :ext:_anoncvs@anoncvs.mirbsd.org:/cvs contrib/hosted/tg/deb/mircpio
-Vcs-Browser: http://cvs.mirbsd.de/contrib/hosted/tg/deb/mircpio/
+VCS-git: git://anonscm.debian.org/collab-maint/pax.git
+VCS-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/pax.git
 
 Package: pax
 Architecture: any

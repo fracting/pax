@@ -1,8 +1,9 @@
-pax (1:20120606-4) UNRELEASED; urgency=low
+pax (1:20120606-4) UNRELEASED; urgency=medium
 
   * Merge 1:20120606-2+deb7u1 upload
+  * debian/control: Move VCS-* fields to Alioth collab-maint git
 
- -- Thorsten Glaser <tg@mirbsd.de>  Sat, 26 Jan 2013 17:10:14 +0000
+ -- Thorsten Glaser <tg@mirbsd.de>  Thu, 03 Jul 2014 19:25:01 +0200
 
 pax (1:20120606-3) experimental; urgency=low
 
