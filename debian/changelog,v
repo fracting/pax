@@ -1,0 +1,993 @@
+head	1.39;
+access;
+symbols
+	pax-20120606-2+deb7u1:1.35.2.1
+	wheezy:1.35.0.2
+	pax-20120606-3:1.38
+	pax-20120606-2:1.35
+	pax-20120606-1:1.31
+	pax-20120605-1:1.30
+	pax-20120520-1:1.26
+	pax-20120216-2:1.23
+	pax-20120216-1:1.20
+	pax-20120212-1:1.18
+	pax-20120211-1:1.17;
+locks; strict;
+comment	@# @;
+
+
+1.39
+date	2013.01.26.17.11.14;	author tg;	state Exp;
+branches;
+next	1.38;
+commitid	10051040E4A2989C552;
+
+1.38
+date	2012.11.26.17.04.54;	author tg;	state Exp;
+branches;
+next	1.37;
+commitid	10050B3A27E37AC33BB;
+
+1.37
+date	2012.09.29.14.39.02;	author tg;	state Exp;
+branches;
+next	1.36;
+commitid	100506708153E6B12CA;
+
+1.36
+date	2012.06.29.21.33.40;	author tg;	state Exp;
+branches;
+next	1.35;
+commitid	1004FEE1F4247B48025;
+
+1.35
+date	2012.06.07.00.38.22;	author tg;	state Exp;
+branches
+	1.35.2.1;
+next	1.34;
+commitid	1004FCFF811322EDED4;
+
+1.34
+date	2012.06.07.00.27.08;	author tg;	state Exp;
+branches;
+next	1.33;
+commitid	1004FCFF5713F76157B;
+
+1.33
+date	2012.06.07.00.08.01;	author tg;	state Exp;
+branches;
+next	1.32;
+commitid	1004FCFF0F62F281BFD;
+
+1.32
+date	2012.06.07.00.02.17;	author tg;	state Exp;
+branches;
+next	1.31;
+commitid	1004FCFEF9E374E2424;
+
+1.31
+date	2012.06.05.22.50.47;	author tg;	state Exp;
+branches;
+next	1.30;
+commitid	1004FCE8D5D6DAB120D;
+
+1.30
+date	2012.06.05.21.23.27;	author tg;	state Exp;
+branches;
+next	1.29;
+commitid	1004FCE78DA027FBD06;
+
+1.29
+date	2012.06.05.20.56.09;	author tg;	state Exp;
+branches;
+next	1.28;
+commitid	1004FCE72810F9C6F4A;
+
+1.28
+date	2012.06.05.19.56.03;	author tg;	state Exp;
+branches;
+next	1.27;
+commitid	1004FCE646507633ED8;
+
+1.27
+date	2012.06.05.19.42.36;	author tg;	state Exp;
+branches;
+next	1.26;
+commitid	1004FCE613A2418193E;
+
+1.26
+date	2012.05.20.18.05.33;	author tg;	state Exp;
+branches;
+next	1.25;
+commitid	1004FB93284513023CF;
+
+1.25
+date	2012.05.20.18.01.19;	author tg;	state Exp;
+branches;
+next	1.24;
+commitid	1004FB9318611F4E2A9;
+
+1.24
+date	2012.05.20.17.50.58;	author tg;	state Exp;
+branches;
+next	1.23;
+commitid	1004FB92F173BC87224;
+
+1.23
+date	2012.02.27.22.55.52;	author tg;	state Exp;
+branches;
+next	1.22;
+commitid	1004F4C0A0D7E47B537;
+
+1.22
+date	2012.02.27.22.50.31;	author tg;	state Exp;
+branches;
+next	1.21;
+commitid	1004F4C089A519BC027;
+
+1.21
+date	2012.02.27.22.41.58;	author tg;	state Exp;
+branches;
+next	1.20;
+commitid	1004F4C06B0554FF2F2;
+
+1.20
+date	2012.02.16.18.02.24;	author tg;	state Exp;
+branches;
+next	1.19;
+commitid	1004F3D44BB2BDF0FEB;
+
+1.19
+date	2012.02.12.03.43.11;	author tg;	state Exp;
+branches;
+next	1.18;
+commitid	1004F37355F0B072F1B;
+
+1.18
+date	2012.02.12.03.03.59;	author tg;	state Exp;
+branches;
+next	1.17;
+commitid	1004F372C236A71421A;
+
+1.17
+date	2012.02.12.02.23.50;	author tg;	state Exp;
+branches;
+next	1.16;
+commitid	1004F3722CE39A146EE;
+
+1.16
+date	2012.02.12.01.14.26;	author tg;	state Exp;
+branches;
+next	1.15;
+commitid	1004F37127A43C89733;
+
+1.15
+date	2011.11.12.00.11.28;	author tg;	state Exp;
+branches;
+next	1.14;
+commitid	1004EBDB9BD4C7CAAED;
+
+1.14
+date	2011.08.17.10.56.04;	author tg;	state Exp;
+branches;
+next	1.13;
+commitid	1004E4B9E5C7E158416;
+
+1.13
+date	2011.08.17.10.55.32;	author tg;	state Exp;
+branches;
+next	1.12;
+commitid	1004E4B9E3B532E506A;
+
+1.12
+date	2011.08.17.09.48.46;	author tg;	state Exp;
+branches;
+next	1.11;
+commitid	1004E4B8E931C25AA5D;
+
+1.11
+date	2011.08.17.09.23.32;	author tg;	state Exp;
+branches;
+next	1.10;
+commitid	1004E4B888605F0E083;
+
+1.10
+date	2011.08.17.08.19.31;	author tg;	state Exp;
+branches;
+next	1.9;
+commitid	1004E4B79A66B37F166;
+
+1.9
+date	2011.08.16.14.37.44;	author tg;	state Exp;
+branches;
+next	1.8;
+commitid	1004E4A80BA5E613817;
+
+1.8
+date	2011.07.28.17.19.20;	author tg;	state Exp;
+branches;
+next	1.7;
+commitid	1004E319A26263D388B;
+
+1.7
+date	2011.03.04.15.06.00;	author tg;	state Exp;
+branches;
+next	1.6;
+commitid	1004D70FFE24E55F660;
+
+1.6
+date	2011.02.27.21.50.16;	author tg;	state Exp;
+branches;
+next	1.5;
+commitid	1004D6AC723271D263F;
+
+1.5
+date	2010.02.25.22.15.35;	author tg;	state Exp;
+branches;
+next	1.4;
+commitid	1004B86F6840FFEB652;
+
+1.4
+date	2010.02.16.23.21.09;	author tg;	state Exp;
+branches;
+next	1.3;
+commitid	1004B7B28701DAC5F45;
+
+1.3
+date	2010.01.28.21.47.12;	author tg;	state Exp;
+branches;
+next	1.2;
+commitid	1004B6205E01EB4781A;
+
+1.2
+date	2009.12.11.11.27.02;	author tg;	state Exp;
+branches;
+next	1.1;
+commitid	1004B222C9E4C97A674;
+
+1.1
+date	2009.11.22.22.08.52;	author tg;	state Exp;
+branches;
+next	;
+commitid	1004B09B67E4C994FE3;
+
+1.35.2.1
+date	2013.01.26.17.06.45;	author tg;	state Exp;
+branches;
+next	;
+commitid	10051040D1362360658;
+
+
+desc
+@@
+
+
+1.39
+log
+@Merge 1:20120606-2+deb7u1 upload
+@
+text
+@pax (1:20120606-4) UNRELEASED; urgency=low
+
+  * Merge 1:20120606-2+deb7u1 upload
+
+ -- Thorsten Glaser <tg@@mirbsd.de>  Sat, 26 Jan 2013 17:10:14 +0000
+
+pax (1:20120606-2+deb7u1) unstable; urgency=low
+
+  * The “I know how that feels, porting” upload
+  * Apparently, x32 did the right thing and uses a 64-bit off_t
+    by default as the BSDs do, even if its long is shorter; it’s
+    the first Linux architecture to do so ⇒ needs an extra check
+  * Upload to unstable, so the x32 porting can go on; it doesn’t
+    need to migrate to wheezy in itself but this change shouldn’t
+    prevent an eventual 1:20120606-2+deb7u2 from migrating either
+
+ -- Thorsten Glaser <tg@@mirbsd.de>  Sat, 26 Jan 2013 17:04:17 +0000
+
+pax (1:20120606-3) experimental; urgency=low
+
+  * “Our littlest” upload
+  * Policy 3.9.4.0, with no relevant changes
+  * Drop temporary B-C for fakeroot on hurd again
+  * debian/watch: mangle the epoch away so DDPO is green again
+  * Completely rewrite packaging using debhelper (Closes: #690381)
+
+ -- Thorsten Glaser <tg@@mirbsd.de>  Mon, 26 Nov 2012 17:01:37 +0000
+
+pax (1:20120606-2) unstable; urgency=low
+
+  * Fix permissions, timestamps, and shuffle dh_* around
+  * Switch to 3.0 (quilt)
+  * Temporarily add a versioned B-C for fakeroot on hurd (#676428)
+
+ -- Thorsten Glaser <tg@@mirbsd.de>  Thu, 07 Jun 2012 00:37:12 +0000
+
+pax (1:20120606-1) unstable; urgency=low
+
+  * The “How the … did I get sore s̲h̲o̲u̲l̲d̲e̲r̲ muscles from football?” upload
+  * Update to new upstream version:
+    - oops, fix tty_init rewrito
+  * This fixes FTBFS
+
+ -- Thorsten Glaser <tg@@mirbsd.de>  Wed, 06 Jun 2012 00:49:57 +0200
+
+pax (1:20120605-1) unstable; urgency=low
+
+  * The “Sport ist Mord” upload
+  * Update to new upstream version:
+    - merge fixes from OpenBSD
+    - improve portability
+    - remove use of stdio in favour of syscalls in some places
+    - mention nōn-support (TOOD) of pax file format in manpages
+  * Drop lintian overrides
+    - false positive is resolved
+    - we don’t really care about no-homepage and no-upstream-changelog
+  * Build-Depends less package! Thanks to “goodbye” sample package!
+  * Aid cross-compiling by setting ${CC} to something useful
+
+ -- Thorsten Glaser <tg@@mirbsd.de>  Tue, 05 Jun 2012 21:23:06 +0000
+
+pax (1:20120520-1) unstable; urgency=low
+
+  * New upstream version
+    - paxtar front-end got a new 'a' option for compression
+      utility auto-detection, based on archive filename
+    - includes options.c change (drop Debian patch)
+  * Mention member size limitations on !kfreebsd !LP64 platforms
+    due to an eglibc bug (#317466)
+  * Override lintian false-positive "hardening-no-stackprotector"
+  * Add overrides for "yes, not an omission, there are none"
+
+ -- Thorsten Glaser <tg@@mirbsd.de>  Sun, 20 May 2012 18:05:19 +0000
+
+pax (1:20120216-2) unstable; urgency=low
+
+  * Update options.c to version from CVS to ensure the order of
+    command line arguments in the cpio front-end more tightly,
+    to prevent creating archives in the wrong format accidentally
+  * Link with --as-needed (not enough to workaround #650145 though ☹)
+  * Policy 3.9.3 (no changes)
+  * Mention non-support of ACLs/EAs in the long description
+
+ -- Thorsten Glaser <tg@@mirbsd.de>  Mon, 27 Feb 2012 22:37:12 +0000
+
+pax (1:20120216-1) unstable; urgency=low
+
+  * Debian GNU/kFreeBSD uses 64-bit off_t line FreeBSD®, unlike GNU
+  * Implement GNU cpio ‘-V’ option
+
+ -- Thorsten Glaser <tg@@mirbsd.de>  Thu, 16 Feb 2012 18:01:39 +0000
+
+pax (1:20120212-1) unstable; urgency=low
+
+  * Brown paper bag: pasto in one of the manpages, and work around a
+    GNU groff deficiency in another
+
+ -- Thorsten Glaser <tg@@mirbsd.de>  Sun, 12 Feb 2012 03:03:15 +0000
+
+pax (1:20120211-1) unstable; urgency=low
+
+  * Take over maintainership of the pax package in Debian from
+    Bdale Garbee (thanks) and replace it with the MirBSD variant
+    also providing paxcpio/paxtar (Closes: #42158) (Closes: #539353)
+  * debian/rules: cleanup (remove dh_installdirs, add back dh_clean)
+  * debian/rules: modernise; use fully hardened dpkg-buildflags
+  * debian/control: rework package description
+
+ -- Thorsten Glaser <tg@@mirbsd.de>  Sun, 12 Feb 2012 02:10:40 +0000
+
+mircpio (20110817-0wtf2) wtf; urgency=low
+
+  * New upstream release, many new features
+    - build from formal release, not CVS export
+  * Update packaging to current standards, still works with etch
+  * Link against libbsd (backport) instead of duplicating code
+  * Move to Policy 3.9.2 (no relevant changes)
+  * Add RCS IDs, VCS-* headers, misc:Depends
+  * Patch manpages to honour the binary præfix (pax→mirpax, etc.)
+  * Enhance package description, mention distinguishing features
+  * paxmirabilis can do Multi-Arch: foreign as requested by vorlon
+  * Add Origin and Bugs headers
+
+ -- Thorsten Glaser <tg@@mirbsd.de>  Wed, 17 Aug 2011 10:55:08 +0000
+
+mircpio (20080906-1) experimental; urgency=low
+
+  * Initial release
+  * Adjust manpages to cope with GNU groff’s inferiorities
+
+ -- Thorsten Glaser <tg@@freewrt.org>  Sun, 07 Sep 2008 01:00:10 +0000
+@
+
+
+1.38
+log
+@upload an oversimplified buildsystem rewrite to please codehelp
+(we lose cross-buildability, but that is complicated, innit?)
+@
+text
+@d1 18
+@
+
+
+1.37
+log
+@replay cid 1004F91C1715FFB3034: DDPO needs the epoch mangled away (WTF?)
+@
+text
+@d1 1
+a1 1
+pax (1:20120606-3) xunstable; urgency=low
+d3 2
+d7 1
+d9 1
+a9 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Sat, 29 Sep 2012 14:38:21 +0000
+@
+
+
+1.36
+log
+@drop temporary Build-Conflicts again
+@
+text
+@d4 1
+d6 1
+a6 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Fri, 29 Jun 2012 21:30:11 +0000
+@
+
+
+1.35
+log
+@3.0 (quilt) and a hurd quirk
+@
+text
+@d1 6
+@
+
+
+1.35.2.1
+log
+@apparently linux-x32 is the only linux arch DTRT and using 64-bit off_t
+even when long is only 32 bit, so it needs an explicit check
+
+XXX we need some configure machinery in paxmirabilis upstream some day
+@
+text
+@a0 12
+pax (1:20120606-2+deb7u1) unstable; urgency=low
+
+  * The “I know how that feels, porting” upload
+  * Apparently, x32 did the right thing and uses a 64-bit off_t
+    by default as the BSDs do, even if its long is shorter; it’s
+    the first Linux architecture to do so ⇒ needs an extra check
+  * Upload to unstable, so the x32 porting can go on; it doesn’t
+    need to migrate to wheezy in itself but this change shouldn’t
+    prevent an eventual 1:20120606-2+deb7u2 from migrating either
+
+ -- Thorsten Glaser <tg@@mirbsd.de>  Sat, 26 Jan 2013 17:04:17 +0000
+
+@
+
+
+1.34
+log
+@fix dir pollution
+@
+text
+@d1 1
+a1 1
+pax (1:20120606-2) xunstable; urgency=low
+d4 2
+d7 1
+a7 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Thu, 07 Jun 2012 00:26:49 +0000
+@
+
+
+1.33
+log
+@fix timestamps
+@
+text
+@d5 1
+a5 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Thu, 07 Jun 2012 00:07:37 +0000
+@
+
+
+1.32
+log
+@fix clean/perms
+@
+text
+@d3 1
+a3 1
+  * Fix permissions and shuffle dh_* around
+d5 1
+a5 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Thu, 07 Jun 2012 00:01:38 +0000
+@
+
+
+1.31
+log
+@new paxmirabilis, AGAIN
+@
+text
+@d1 6
+@
+
+
+1.30
+log
+@better cross-compiling; update docs, add lotsa comments
+@
+text
+@d1 9
+@
+
+
+1.29
+log
+@empty out B-D
+@
+text
+@d12 2
+a13 1
+  * Build-Depends less package! Thanks to “goodbye”!
+d15 1
+a15 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Tue, 05 Jun 2012 19:42:23 +0000
+@
+
+
+1.28
+log
+@update for latest upstream code
+@
+text
+@d1 1
+a1 1
+pax (1:20120605-1) xunstable; urgency=low
+d3 2
+a4 1
+  * New upstream version
+d12 1
+a12 1
+  * Drop no longer needed build dependency on libbsd-dev
+@
+
+
+1.27
+log
+@drop lintian overrides; I believe the false-positive is also fixed now
+@
+text
+@d11 1
+@
+
+
+1.26
+log
+@since we are overriding anyway, put this too
+@
+text
+@d1 13
+@
+
+
+1.25
+log
+@please lintian (ugh, W for a new, experimental flag?)
+@
+text
+@d10 1
+d12 1
+a12 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Sun, 20 May 2012 18:00:53 +0000
+@
+
+
+1.24
+log
+@new version, extend description too
+@
+text
+@d8 2
+d11 1
+a11 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Sun, 20 May 2012 17:50:42 +0000
+@
+
+
+1.23
+log
+@sync
+@
+text
+@d1 10
+@
+
+
+1.22
+log
+@turns out -Wl,--as-needed is NOT enough to work around #650145 ☹ so drop it
+@
+text
+@d6 1
+d8 1
+@
+
+
+1.21
+log
+@update options.c from CVS and do a fixing round (as-needed and S-V 3.9.3)
+@
+text
+@a5 1
+  * Link with --as-needed to work around a GCC/LTO cosmetic bug
+@
+
+
+1.20
+log
+@prepare upload fixing kfreebsd and adding GNU cpio feature
+@
+text
+@d1 10
+@
+
+
+1.19
+log
+@guess what, kfreebsd is troubling more than hurd
+@
+text
+@d1 1
+a1 1
+pax (1:20120212-2) unstable; urgency=low
+d4 1
+d6 1
+a6 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Sun, 12 Feb 2012 03:42:55 +0000
+@
+
+
+1.18
+log
+@upload a paper bag (at least this works on the Hurd porterbox, yay!)
+@
+text
+@d1 6
+@
+
+
+1.17
+log
+@prepare upload to Debian unstable
+@
+text
+@d1 7
+@
+
+
+1.16
+log
+@use hardened dpkg-buildflags (+all) and modernise flags generation
+@
+text
+@d1 1
+a1 1
+mircpio (20110817-0wtf3) xwtf; urgency=low
+d3 3
+d8 1
+d10 1
+a10 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Sat, 12 Nov 2011 00:08:05 +0000
+@
+
+
+1.15
+log
+@lintian and d/rules cleanup round
+@
+text
+@d4 1
+@
+
+
+1.14
+log
+@refresh
+@
+text
+@d1 6
+@
+
+
+1.13
+log
+@refresh
+@
+text
+@d6 1
+a6 1
+  * Link against libbsd instead of duplicating code
+@
+
+
+1.12
+log
+@we need strmode…
+@
+text
+@d1 1
+a1 1
+mircpio (20110817-0wtf1) wtf; urgency=low
+d5 1
+a5 1
+  * Update packaging to current standards
+d14 1
+a14 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Wed, 17 Aug 2011 09:48:39 +0000
+@
+
+
+1.11
+log
+@merge upstream source into packaging branch and release
+(we build from unmodified sources once again, yay!)
+
+sponsored by tarent solutions GmbH
+@
+text
+@d14 1
+a14 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Wed, 17 Aug 2011 09:22:40 +0000
+@
+
+
+1.10
+log
+@next dab at a package
+@
+text
+@d1 1
+a1 1
+mircpio (20110817-0exp1) experimental; urgency=low
+d5 1
+a5 1
+    - update packaging to current standards
+d7 2
+a9 2
+  * Move to debhelper 5, Policy 3.9.2 (no relevant changes)
+  * Add RCS IDs almost everywhere, VCS-* headers, misc:Depends
+d14 1
+a14 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Wed, 17 Aug 2011 08:15:17 +0000
+@
+
+
+1.9
+log
+@let’s see what lintian says to this, and which compiler warnings we get
+(note: upstream source in ../ not updated yet)
+@
+text
+@d1 1
+a1 1
+mircpio (20110816-0exp1) experimental; urgency=low
+d3 1
+a3 1
+  * New upstream release
+d8 1
+a8 1
+  * Move to debhelper 5, Policy 3.8.4 (no relevant changes)
+d10 1
+a10 2
+  * Enhance package description
+  * debian/source/format: Enforce "1.0" manually, for now
+d14 1
+a14 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Tue, 16 Aug 2011 14:20:16 +0000
+@
+
+
+1.8
+log
+@switch to new packaging style
+@
+text
+@d1 1
+a1 1
+mircpio (20091122-1) xexperimental; urgency=low
+d5 1
+a5 1
+    - restructure build/patch system similar to the mksh package
+d9 1
+a9 2
+  * Add RCS IDs almost everywhere
+  * Add DMUA, VCS-* headers, misc:Depends
+a11 1
+  * debian/control: Remove DMUA, I'm a DD now
+a13 4
+  * XXX missing
+    - versionierte b-d auf noch nicht hochgeladener libbsd (__SCCSID)
+    - copyright fill-in
+  * Update packaging style
+d15 1
+a15 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Thu, 28 Jul 2011 17:15:10 +0000
+@
+
+
+1.7
+log
+@• Add Origin and Bugs headers
+• Allow mircpio or pax or (GNU) cpio as build dependency
+@
+text
+@d1 1
+a1 1
+mircpio (20091122-1) experimental; urgency=low
+d19 1
+d21 1
+a21 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Fri, 11 Dec 2009 12:22:34 +0105
+@
+
+
+1.6
+log
+@more Multi-Arch: foreign
+also, upload rs
+@
+text
+@d15 1
+a16 1
+    - b-d auf mircpio|cpio|pax (auch mksh, etc.)
+d20 1
+a20 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Fri, 11 Dec 2009 12:22:34 +0104
+@
+
+
+1.5
+log
+@nuke DMUA field, I am DD of BSD^H^Horg
+@
+text
+@d14 1
+d20 1
+a20 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Fri, 11 Dec 2009 12:22:34 +0103
+@
+
+
+1.4
+log
+@prevent "accidents" such as Debian #570064 where someone changes to debian/source/format="3.0 (quilt)" in an NMU (wtf?!) - thanks to mika@@d.o for noticing
+@
+text
+@d13 1
+d19 1
+a19 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Fri, 11 Dec 2009 12:22:34 +0102
+@
+
+
+1.3
+log
+@bump Debian Policy where we are at 3.8.3 already
+(does not affect us)
+@
+text
+@d12 1
+d18 1
+a18 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Fri, 11 Dec 2009 12:22:34 +0101
+@
+
+
+1.2
+log
+@commit temporary tree
+not working yet, we need libbsd from git, not in debian yet
+also, fill in the XXXes and simplify build/patch system (mksh’s too!)
+@
+text
+@d8 1
+a8 1
+  * Move to debhelper 5, Policy 3.8.3 (no relevant changes)
+d17 1
+a17 1
+ -- Thorsten Glaser <tg@@mirbsd.de>  Fri, 11 Dec 2009 12:22:34 +0100
+@
+
+
+1.1
+log
+@dump almost all of the MirDebian “WTF” Repository in here
+for further improvements, backups, collaboration possibilities, etc.
+CVS: ----------------------------------------------------------------------
+CVS: ATTENTION: read-only mode selected!
+CVS: Enter Log.  Lines beginning with `CVS:' are removed automatically
+CVS:
+CVS: Committing in .
+CVS:
+CVS: Added Files:
+CVS: 	ca-bundle/bsd/certdata.txt ca-bundle/bsd/keystore.jks
+CVS: 	ca-bundle/bsd/ksslcalist ca-bundle/bsd/ssl.certs.shar
+CVS: 	ca-bundle/debian/ca-bundle.install
+CVS: 	ca-bundle/debian/ca-bundle.links
+CVS: 	ca-bundle/debian/ca-bundle.manpages
+CVS: 	ca-bundle/debian/ca-bundle.postinst
+CVS: 	ca-bundle/debian/ca-bundle.postrm ca-bundle/debian/changelog
+CVS: 	ca-bundle/debian/compat ca-bundle/debian/control
+CVS: 	ca-bundle/debian/copyright ca-bundle/debian/rules
+CVS: 	ca-bundle/debian/source.lintian-overrides
+CVS: 	ca-bundle/debian/lintian/ca-bundle
+CVS: 	ca-bundle/sbin/update-ca-certificates
+CVS: 	ca-bundle/sbin/update-ca-certificates.8
+CVS: 	mbsd-bug/debian/NOTE.crtstuff mbsd-bug/debian/NOTE.sysroot
+CVS: 	mbsd-bug/debian/PKG.install
+CVS: 	mbsd-bug/debian/PKG.lintian-overrides
+CVS: 	mbsd-bug/debian/changelog mbsd-bug/debian/compat
+CVS: 	mbsd-bug/debian/control mbsd-bug/debian/copyright
+CVS: 	mbsd-bug/debian/mirdefs.h mbsd-bug/debian/rules
+CVS: 	mbsd-bug/debian/source.lintian-overrides
+CVS: 	mircpio/debian/changelog mircpio/debian/compat
+CVS: 	mircpio/debian/control mircpio/debian/copyright
+CVS: 	mircpio/debian/install mircpio/debian/manpages
+CVS: 	mircpio/debian/rules mircpio/debian/watch
+CVS: 	mircpio/debian/diffs/extern.h.diff mirmake/debian/changelog
+CVS: 	mirmake/debian/compat mirmake/debian/control
+CVS: 	mirmake/debian/copyright mirmake/debian/instnames.ed
+CVS: 	mirmake/debian/mirmake.install mirmake/debian/mirmake.manpages
+CVS: 	mirmake/debian/rules mirmake/debian/watch
+CVS: 	openntpd/debian/changelog openntpd/debian/compat
+CVS: 	openntpd/debian/control openntpd/debian/copyright
+CVS: 	openntpd/debian/ntp.conf openntpd/debian/ntp.cron.daily
+CVS: 	openntpd/debian/ntp.default openntpd/debian/ntp.dhcp
+CVS: 	openntpd/debian/ntp.init openntpd/debian/ntpdate.default
+CVS: 	openntpd/debian/ntpdate.dhcp openntpd/debian/ntpdate.if-up
+CVS: 	openntpd/debian/openntpd.default openntpd/debian/openntpd.docs
+CVS: 	openntpd/debian/openntpd.init
+CVS: 	openntpd/debian/openntpd.postinst
+CVS: 	openntpd/debian/openntpd.postrm openntpd/debian/openntpd.prerm
+CVS: 	openntpd/debian/rules openntpd/debian/source.lintian-overrides
+CVS: 	openntpd/debian/watch openntpd/debian/patches/00list
+CVS: 	openntpd/debian/patches/01-config.dpatch
+CVS: 	openntpd/debian/patches/02-reconnect.dpatch
+CVS: 	openntpd/debian/patches/03-ipv4only.patch
+CVS: 	openntpd/debian/patches/04-backslash.patch
+CVS: 	openntpd/debian/patches/05-mirtropy.dpatch
+CVS: 	openntpd/debian/patches/06-libbsd.dpatch
+CVS: 	openntpd/debian/patches/07-fixsympas.dpatch
+CVS: 	openntpd/debian/patches/openntpd-3.9p1-linux-adjtimex.diff
+CVS: 	openntpd/debian/script/openntpd php-perl/debian/changelog
+CVS: 	php-perl/debian/changelog.xsl php-perl/debian/compat
+CVS: 	php-perl/debian/control php-perl/debian/copyright
+CVS: 	php-perl/debian/docs php-perl/debian/pecl
+CVS: 	php-perl/debian/perl.ini php-perl/debian/php5-perl.dirs
+CVS: 	php-perl/debian/rules php-perl/debian/watch
+CVS: 	wtf-debian-keyring/debian/changelog
+CVS: 	wtf-debian-keyring/debian/control
+CVS: 	wtf-debian-keyring/debian/copyright
+CVS: 	wtf-debian-keyring/debian/postinst
+CVS: 	wtf-debian-keyring/debian/prerm
+CVS: 	wtf-debian-keyring/debian/rules
+CVS: 	wtf-debian-keyring/keyrings/wtf-debian-keyring.gpg
+CVS: 	wtf-debian-keyring/keyrings/wtf-debian-removed-keys.gpg
+CVS: ----------------------------------------------------------------------
+@
+text
+@d1 18
+d21 1
+a21 1
+  * Initial release. (Closes: #9999999999 just so that lintian is happy)
+@
+

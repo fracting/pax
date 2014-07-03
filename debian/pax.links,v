@@ -1,0 +1,30 @@
+head	1.1;
+access;
+symbols
+	pax-20120606-3:1.1;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2012.11.26.17.09.58;	author tg;	state Exp;
+branches;
+next	;
+commitid	10050B3A27E37AC33BB;
+
+
+desc
+@@
+
+
+1.1
+log
+@upload an oversimplified buildsystem rewrite to please codehelp
+(we lose cross-buildability, but that is complicated, innit?)
+@
+text
+@# $MirOS: contrib/hosted/tg/deb/jupp/debian/joe-jupp.links,v 1.1 2011/07/27 19:44:24 tg Exp $
+#-
+bin/pax bin/paxcpio
+bin/pax bin/paxtar
+@

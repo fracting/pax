@@ -1,0 +1,31 @@
+head	1.1;
+access;
+symbols
+	pax-20120606-2+deb7u1:1.1
+	wheezy:1.1.0.2
+	pax-20120606-3:1.1
+	pax-20120606-2:1.1;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2012.06.07.00.38.23;	author tg;	state Exp;
+branches;
+next	;
+commitid	1004FCFF811322EDED4;
+
+
+desc
+@@
+
+
+1.1
+log
+@3.0 (quilt) and a hurd quirk
+@
+text
+@Please review changes against upstream code using SCM,
+see the Vcs-* tags in debian/control for its location.
+
+@

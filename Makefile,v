@@ -1,0 +1,168 @@
+head	1.1;
+branch	1.1.221;
+access;
+symbols
+	pax-20120606-2+deb7u1:1.1.221.4
+	wheezy:1.1.221.4.0.2
+	pax-20120606-3:1.1.221.4
+	pax-20120606-2:1.1.221.4
+	pax-20120606-1:1.1.221.4
+	pax-20120606:1.1.221.4
+	pax-20120605-1:1.1.221.4
+	pax-20120605:1.1.221.4
+	pax-20120520-1:1.1.221.3
+	pax-20120520:1.1.221.3
+	pax-20120216-2:1.1.221.3
+	pax-20120216-1:1.1.221.3
+	pax-20120216:1.1.221.3
+	pax-20120212-1:1.1.221.2
+	pax-20120212:1.1.221.2
+	pax-20120211-1:1.1.221.2
+	pax-20120211:1.1.221.2
+	mircpio_20110817:1.1.221.2
+	mircpio-20091122:1.1.221.1
+	mircpio-20080906:1.1.221.1
+	origtgz:1.1.221;
+locks; strict;
+comment	@# @;
+expand	@b@;
+
+
+1.1
+date	2011.07.28.16.48.01;	author tg;	state Exp;
+branches
+	1.1.221.1;
+next	;
+commitid	1004E3192C8046E063B;
+
+1.1.221.1
+date	2011.07.28.16.48.01;	author tg;	state Exp;
+branches;
+next	1.1.221.2;
+commitid	1004E3192C8046E063B;
+
+1.1.221.2
+date	2011.08.17.09.18.22;	author tg;	state Exp;
+branches;
+next	1.1.221.3;
+commitid	1004E4B875015FAFEA7;
+
+1.1.221.3
+date	2012.02.16.17.56.49;	author tg;	state Exp;
+branches;
+next	1.1.221.4;
+commitid	1004F3D436E207CDFC6;
+
+1.1.221.4
+date	2012.06.05.19.31.48;	author tg;	state Exp;
+branches;
+next	;
+commitid	1004FCE5EBC0C8B75D5;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@# $MirOS: src/bin/pax/Makefile,v 1.6 2008/05/07 13:50:21 tg Exp $
+# $OpenBSD: Makefile,v 1.10 2001/05/26 00:32:20 millert Exp $
+
+# To install on versions prior to BSD 4.4 the following may have to be
+# defined with CFLAGS +=
+#
+# -DLONG_OFF_T	Define this if the base type of an off_t is a long (and is
+#		NOT a quad).  (This is often defined in the file
+#		/usr/include/sys/types.h).
+# 		This define is important, as if you do have a quad_t
+# 		off_t and define LONG_OFF_T, pax will compile but will
+# 		NOT RUN PROPERLY.
+#
+
+PROG=   pax
+SRCS=	ar_io.c ar_subs.c buf_subs.c cache.c cpio.c file_subs.c ftree.c\
+	gen_subs.c getoldopt.c options.c pat_rep.c pax.c sel_subs.c tables.c\
+	tar.c tty_subs.c
+MAN=	pax.1 tar.1 cpio.1
+LINKS=	${BINDIR}/pax ${BINDIR}/tar \
+	${BINDIR}/pax ${BINDIR}/cpio
+
+.if (${MACHINE_OS} == "Interix") || (${MACHINE_OS} == "Linux") || (${MACHINE_OS} == "GNU")
+CPPFLAGS+= -DLONG_OFF_T
+.endif
+
+.include <bsd.prog.mk>
+@
+
+
+1.1.221.1
+log
+@Import mircpio_20080906.orig.tar.gz
+(even though this package needs a general rework, and -M dirslash too)
+@
+text
+@@
+
+
+1.1.221.2
+log
+@Import distfile into vendor branch
+-r--r--r--  1 tg  miros-cvssrc  136185 Aug 17 09:14 /MirOS/dist/mir/cpio/paxmirabilis-20110817.cpio.gz
+-rw-r--r--  1 tg  tg            138201 Aug 17 09:14 paxmirabilis_20110817.orig.tar.gz
+@
+text
+@d1 1
+a1 1
+# $MirOS: src/bin/pax/Makefile,v 1.7 2011/08/16 21:32:45 tg Exp $
+d16 2
+a17 2
+SRCS=	ar.c ar_io.c ar_subs.c buf_subs.c cache.c cpio.c file_subs.c ftree.c \
+	gen_subs.c getoldopt.c options.c pat_rep.c pax.c sel_subs.c tables.c \
+@
+
+
+1.1.221.3
+log
+@-rw-r--r--   1 tg    tg     - 138212 Feb 16 17:54 pax_20120216.orig.tar.gz
+@
+text
+@d1 1
+a1 1
+# $MirOS: src/bin/pax/Makefile,v 1.9 2012/02/16 17:48:06 tg Exp $
+d3 10
+a12 3
+#-
+# It may be necessary to define some options on pre-4.4BSD or
+# other operating systems:
+a13 2
+# -DLONG_OFF_T	The base type of off_t is a long, not a long long.
+#		This is often defined in: /usr/include/sys/types.h
+d23 1
+a23 2
+.if (${MACHINE_OS} == "Interix") || (${MACHINE_OS} == "Linux") || \
+    ((${MACHINE_OS} == "GNU") && (${OSNAME} != "GNU/kFreeBSD"))
+@
+
+
+1.1.221.4
+log
+@import prospective paxmirabilis of today into mircpio debian packaging
+@
+text
+@d1 1
+a1 1
+# $MirOS: src/bin/pax/Makefile,v 1.11 2012/06/05 18:15:58 tg Exp $
+a22 6
+.if (${MACHINE_OS} == "BSD")
+CPPFLAGS+= -DHAVE_STRLCPY
+CPPFLAGS+= -DHAVE_STRMODE
+CPPFLAGS+= -DHAVE_VIS
+.endif
+
+@
+
+

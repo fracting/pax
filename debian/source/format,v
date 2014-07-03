@@ -1,0 +1,54 @@
+head	1.2;
+access;
+symbols
+	pax-20120606-2+deb7u1:1.2
+	wheezy:1.2.0.2
+	pax-20120606-3:1.2
+	pax-20120606-2:1.2
+	pax-20120606-1:1.1
+	pax-20120605-1:1.1
+	pax-20120520-1:1.1
+	pax-20120216-2:1.1
+	pax-20120216-1:1.1
+	pax-20120212-1:1.1
+	pax-20120211-1:1.1;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2012.06.07.00.38.23;	author tg;	state Exp;
+branches;
+next	1.1;
+commitid	1004FCFF811322EDED4;
+
+1.1
+date	2010.02.16.23.21.10;	author tg;	state Exp;
+branches;
+next	;
+commitid	1004B7B28701DAC5F45;
+
+
+desc
+@@
+
+
+1.2
+log
+@3.0 (quilt) and a hurd quirk
+@
+text
+@3.0 (quilt)
+@
+
+
+1.1
+log
+@prevent "accidents" such as Debian #570064 where someone changes to debian/source/format="3.0 (quilt)" in an NMU (wtf?!) - thanks to mika@@d.o for noticing
+@
+text
+@d1 1
+a1 1
+1.0
+@
+

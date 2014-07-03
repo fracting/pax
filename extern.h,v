@@ -1,0 +1,675 @@
+head	1.3;
+branch	1.1.221;
+access;
+symbols
+	pax-20120606-2+deb7u1:1.1.221.7
+	wheezy:1.1.221.7.0.2
+	pax-20120606-3:1.1.221.7
+	pax-20120606-2:1.1.221.7
+	pax-20120606-1:1.1.221.7
+	pax-20120606:1.1.221.7
+	pax-20120605-1:1.1.221.7
+	pax-20120605:1.1.221.7
+	pax-20120520-1:1.1.221.6
+	pax-20120520:1.1.221.6
+	pax-20120216-2:1.1.221.5
+	pax-20120216-1:1.1.221.5
+	pax-20120216:1.1.221.5
+	pax-20120212-1:1.1.221.4
+	pax-20120212:1.1.221.4
+	pax-20120211-1:1.1.221.4
+	pax-20120211:1.1.221.4
+	mircpio_20110817:1.1.221.3
+	mircpio-20091122:1.1.221.2
+	mircpio-20080906:1.1.221.1
+	origtgz:1.1.221;
+locks; strict;
+comment	@ * @;
+expand	@b@;
+
+
+1.3
+date	2011.08.17.09.23.31;	author tg;	state Exp;
+branches;
+next	1.2;
+commitid	1004E4B888605F0E083;
+
+1.2
+date	2011.07.28.17.19.20;	author tg;	state Exp;
+branches;
+next	1.1;
+commitid	1004E319A26263D388B;
+
+1.1
+date	2011.07.28.16.48.01;	author tg;	state Exp;
+branches
+	1.1.221.1;
+next	;
+commitid	1004E3192C8046E063B;
+
+1.1.221.1
+date	2011.07.28.16.48.01;	author tg;	state Exp;
+branches;
+next	1.1.221.2;
+commitid	1004E3192C8046E063B;
+
+1.1.221.2
+date	2011.07.28.17.11.41;	author tg;	state Exp;
+branches;
+next	1.1.221.3;
+commitid	1004E31985F24E6CB4D;
+
+1.1.221.3
+date	2011.08.17.09.18.26;	author tg;	state Exp;
+branches;
+next	1.1.221.4;
+commitid	1004E4B875015FAFEA7;
+
+1.1.221.4
+date	2012.02.12.02.23.15;	author tg;	state Exp;
+branches;
+next	1.1.221.5;
+commitid	1004F372297099197B4;
+
+1.1.221.5
+date	2012.02.16.17.56.53;	author tg;	state Exp;
+branches;
+next	1.1.221.6;
+commitid	1004F3D436E207CDFC6;
+
+1.1.221.6
+date	2012.05.20.17.38.56;	author tg;	state Exp;
+branches;
+next	1.1.221.7;
+commitid	1004FB92C473E896F98;
+
+1.1.221.7
+date	2012.06.05.19.31.54;	author tg;	state Exp;
+branches;
+next	;
+commitid	1004FCE5EBC0C8B75D5;
+
+
+desc
+@@
+
+
+1.3
+log
+@merge upstream source into packaging branch and release
+(we build from unmodified sources once again, yay!)
+
+sponsored by tarent solutions GmbH
+@
+text
+@/**	$MirOS: src/bin/pax/extern.h,v 1.15 2011/08/16 21:32:47 tg Exp $ */
+/*	$OpenBSD: extern.h,v 1.32 2006/11/17 08:38:04 otto Exp $	*/
+/*	$NetBSD: extern.h,v 1.5 1996/03/26 23:54:16 mrg Exp $	*/
+
+/*-
+ * Copyright (c) 1992 Keith Muller.
+ * Copyright (c) 1992, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * This code is derived from software contributed to Berkeley by
+ * Keith Muller of the University of California, San Diego.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *	@@(#)extern.h	8.2 (Berkeley) 4/18/94
+ */
+
+/*
+ * External references from each source file
+ */
+
+#include <sys/cdefs.h>
+#if defined(__GLIBC__)
+#include <time.h>
+#endif
+
+
+/*
+ * ar.c
+ */
+int uar_stwr(int);
+int uar_ismagic(char *);
+int uar_id(char *, int) __attribute__((__noreturn__));
+int uar_rd(ARCHD *, char *);
+int uar_wr(ARCHD *);
+int uar_wr_data(ARCHD *, int, off_t *);
+off_t uar_endrd(void);
+int uar_trail(ARCHD *, char *, int, int *) __attribute__((__noreturn__));
+
+/*
+ * ar_io.c
+ */
+extern const char *arcname;
+extern const char *gzip_program;
+extern int force_one_volume;
+int ar_open(const char *);
+void ar_close(void);
+void ar_drain(void);
+int ar_set_wr(void);
+int ar_app_ok(void);
+int ar_read(char *, int);
+int ar_write(char *, int);
+int ar_rdsync(void);
+int ar_fow(off_t, off_t *);
+int ar_rev(off_t );
+int ar_next(void);
+extern int ar_do_keepopen;
+int ar_next_keepopen(void);
+
+/*
+ * ar_subs.c
+ */
+extern u_long flcnt;
+void list(void);
+void extract(void);
+void append(void);
+void archive(void);
+void copy(void);
+
+/*
+ * buf_subs.c
+ */
+extern int blksz;
+extern int wrblksz;
+extern int maxflt;
+extern int rdblksz;
+extern off_t wrlimit;
+extern off_t rdcnt;
+extern off_t wrcnt;
+int wr_start(void);
+int rd_start(void);
+void cp_start(void);
+int appnd_start(off_t);
+int rd_sync(void);
+void pback(char *, int);
+int rd_skip(off_t);
+void wr_fin(void);
+int wr_rdbuf(char *, int);
+int rd_wrbuf(char *, int);
+int wr_skip(off_t);
+int wr_rdfile(ARCHD *, int, off_t *);
+int rd_wrfile(ARCHD *, int, off_t *);
+void cp_file(ARCHD *, int, int);
+int buf_fill(void);
+int buf_fill_internal(int);
+int buf_flush(int);
+
+/*
+ * cache.c
+ */
+int uidtb_start(void);
+int gidtb_start(void);
+int usrtb_start(void);
+int grptb_start(void);
+const char *name_uid(uid_t, int);
+const char *name_gid(gid_t, int);
+int uid_name(const char *, uid_t *);
+int gid_name(const char *, gid_t *);
+
+/*
+ * cpio.c
+ */
+int cpio_strd(void);
+int cpio_trail(ARCHD *, char *, int, int *);
+int cpio_endwr(void);
+int cpio_id(char *, int);
+int cpio_rd(ARCHD *, char *);
+off_t cpio_endrd(void);
+int cpio_stwr(int);
+int dist_stwr(int);
+int cpio_wr(ARCHD *);
+int vcpio_id(char *, int);
+int crc_id(char *, int);
+int crc_strd(void);
+int vcpio_rd(ARCHD *, char *);
+off_t vcpio_endrd(void);
+int crc_stwr(int);
+int v4root_stwr(int);
+int v4norm_stwr(int);
+int vcpio_wr(ARCHD *);
+int bcpio_id(char *, int);
+int bcpio_rd(ARCHD *, char *);
+off_t bcpio_endrd(void);
+int bcpio_wr(ARCHD *);
+
+/*
+ * file_subs.c
+ */
+extern char *gnu_name_string, *gnu_link_string;
+int file_creat(ARCHD *);
+void file_close(ARCHD *, int);
+int lnk_creat(ARCHD *, int *);
+int cross_lnk(ARCHD *);
+int chk_same(ARCHD *);
+int node_creat(ARCHD *);
+int unlnk_exist(char *, int);
+int chk_path(char *, uid_t, gid_t);
+void set_ftime(char *fnm, time_t mtime, time_t atime, int frc);
+int set_ids(char *, uid_t, gid_t);
+int fset_ids(char *, int, uid_t, gid_t);
+int set_lids(char *, uid_t, gid_t);
+void set_pmode(char *, mode_t);
+void fset_pmode(char *, int, mode_t);
+int file_write(int, char *, int, int *, int *, int, char *);
+void file_flush(int, char *, int);
+void rdfile_close(ARCHD *, int *);
+int set_crc(ARCHD *, int);
+
+/*
+ * ftree.c
+ */
+int ftree_start(void);
+int ftree_add(char *, int);
+void ftree_sel(ARCHD *);
+void ftree_chk(void);
+int next_file(ARCHD *);
+
+/*
+ * gen_subs.c
+ */
+void ls_list(ARCHD *, time_t, FILE *);
+void ls_tty(ARCHD *);
+void safe_print(const char *, FILE *);
+u_long asc_ul(char *, int, int);
+int ul_asc(u_long, char *, int, int);
+#ifndef LONG_OFF_T
+u_quad_t asc_uqd(char *, int, int);
+int uqd_asc(u_quad_t, char *, int, int);
+#endif
+size_t fieldcpy(char *, size_t, const char *, size_t);
+
+/*
+ * getoldopt.c
+ */
+int getoldopt(int, char **, const char *);
+
+/*
+ * options.c
+ */
+extern FSUB fsub[];
+extern int ford[];
+void options(int, char **);
+OPLIST * opt_next(void);
+int opt_add(const char *);
+int bad_opt(void);
+char *chdname;
+
+/*
+ * pat_rep.c
+ */
+int rep_add(char *);
+int pat_add(char *, char *);
+void pat_chk(void);
+int pat_sel(ARCHD *);
+int pat_match(ARCHD *);
+int mod_name(ARCHD *);
+int set_dest(ARCHD *, char *, int);
+
+/*
+ * pax.c
+ */
+extern int act;
+extern FSUB *frmt;
+extern int cflag;
+extern int cwdfd;
+extern int dflag;
+extern int iflag;
+extern int kflag;
+extern int lflag;
+extern int nflag;
+extern int tflag;
+extern int uflag;
+extern int vflag;
+extern int Dflag;
+extern int Hflag;
+extern int Lflag;
+extern int Xflag;
+extern int Yflag;
+extern int Zflag;
+extern int zeroflag;
+extern int vfpart;
+extern int patime;
+extern int pmtime;
+extern int nodirs;
+extern int pmode;
+extern int pids;
+extern int rmleadslash;
+extern int exit_val;
+extern int docrc;
+extern char *dirptr;
+extern char *ltmfrmt;
+extern const char *argv0;
+extern FILE *listf;
+extern char *tempfile;
+extern char *tempbase;
+extern int havechd;
+
+int main(int, char **);
+
+/*
+ * sel_subs.c
+ */
+int sel_chk(ARCHD *);
+int grp_add(char *);
+int usr_add(char *);
+int trng_add(char *);
+
+/*
+ * tables.c
+ */
+int lnk_start(void);
+int chk_lnk(ARCHD *);
+void purg_lnk(ARCHD *);
+void lnk_end(void);
+int ftime_start(void);
+int chk_ftime(ARCHD *);
+int name_start(void);
+int add_name(char *, int, char *);
+void sub_name(char *, int *, size_t);
+int dev_start(void);
+int add_dev(ARCHD *);
+int map_dev(ARCHD *, u_long, u_long);
+int atdir_start(void);
+void atdir_end(void);
+void add_atdir(char *, dev_t, ino_t, time_t, time_t);
+int get_atdir(dev_t, ino_t, time_t *, time_t *);
+int dir_start(void);
+void add_dir(char *, struct stat *, int);
+void proc_dir(void);
+u_int st_hash(const char *, int, int);
+int flnk_start(void);
+int chk_flnk(ARCHD *);
+
+/*
+ * tar.c
+ */
+extern char *gnu_hack_string;
+int tar_endwr(void);
+off_t tar_endrd(void);
+int tar_trail(ARCHD *, char *, int, int *);
+int tar_id(char *, int);
+int tar_opt(void);
+int tar_rd(ARCHD *, char *);
+int tar_wr(ARCHD *);
+int ustar_strd(void);
+int ustar_stwr(int);
+int ustar_id(char *, int);
+int ustar_rd(ARCHD *, char *);
+int ustar_wr(ARCHD *);
+
+/*
+ * tty_subs.c
+ */
+int tty_init(void);
+void tty_prnt(const char *, ...)
+    __attribute__((__format__ (__printf__, 1, 2)));
+int tty_read(char *, int);
+void paxwarn(int, const char *, ...)
+    __attribute__((__format__ (__printf__, 2, 3)));
+void syswarn(int, int, const char *, ...)
+    __attribute__((__format__ (__printf__, 3, 4)));
+
+/*
+ * part of the OS
+ */
+#ifdef USE_LIBBSD
+size_t strlcat(char *, const char *, size_t);
+size_t strlcpy(char *, const char *, size_t);
+#endif
+@
+
+
+1.2
+log
+@switch to new packaging style
+@
+text
+@d1 1
+a1 1
+/**	$MirOS: src/bin/pax/extern.h,v 1.12 2009/10/04 14:51:06 tg Exp $ */
+a47 1
+#include <bsd/bsd.h>
+a48 5
+#if !defined(__INTERIX) && !defined(__APPLE__)
+#define HAS_TAPE	1
+#else
+#define HAS_TAPE	0
+#endif
+d50 11
+d79 2
+d117 1
+d141 2
+a142 2
+int cpio_stwr(void);
+int dist_stwr(void);
+d149 3
+a151 3
+int crc_stwr(void);
+int v4root_stwr(void);
+int v4norm_stwr(void);
+d318 1
+a318 1
+int ustar_stwr(void);
+d328 1
+a328 1
+    __attribute__((format (printf, 1, 2)));
+d331 1
+a331 1
+    __attribute__((format (printf, 2, 3)));
+d333 9
+a341 1
+    __attribute__((format (printf, 3, 4)));
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+/**	$MirOS: src/bin/pax/extern.h,v 1.10 2007/10/23 20:07:42 tg Exp $ */
+d48 8
+d156 1
+a156 1
+int lnk_creat(ARCHD *);
+@
+
+
+1.1.221.1
+log
+@Import mircpio_20080906.orig.tar.gz
+(even though this package needs a general rework, and -M dirslash too)
+@
+text
+@@
+
+
+1.1.221.2
+log
+@Import paxmirabilis-20091122.cpio.gz
+@
+text
+@d1 1
+a1 1
+/**	$MirOS: src/bin/pax/extern.h,v 1.12 2009/10/04 14:51:06 tg Exp $ */
+a48 7
+#if !defined(__INTERIX) && !defined(__APPLE__)
+#define HAS_TAPE	1
+#else
+#define HAS_TAPE	0
+#endif
+
+
+d148 1
+a148 1
+int lnk_creat(ARCHD *, int *);
+@
+
+
+1.1.221.3
+log
+@Import distfile into vendor branch
+-r--r--r--  1 tg  miros-cvssrc  136185 Aug 17 09:14 /MirOS/dist/mir/cpio/paxmirabilis-20110817.cpio.gz
+-rw-r--r--  1 tg  tg            138201 Aug 17 09:14 paxmirabilis_20110817.orig.tar.gz
+@
+text
+@d1 1
+a1 1
+/**	$MirOS: src/bin/pax/extern.h,v 1.15 2011/08/16 21:32:47 tg Exp $ */
+d49 5
+a54 11
+/*
+ * ar.c
+ */
+int uar_stwr(int);
+int uar_ismagic(char *);
+int uar_id(char *, int) __attribute__((__noreturn__));
+int uar_rd(ARCHD *, char *);
+int uar_wr(ARCHD *);
+int uar_wr_data(ARCHD *, int, off_t *);
+off_t uar_endrd(void);
+int uar_trail(ARCHD *, char *, int, int *) __attribute__((__noreturn__));
+a72 2
+extern int ar_do_keepopen;
+int ar_next_keepopen(void);
+a108 1
+int buf_fill_internal(int);
+d132 2
+a133 2
+int cpio_stwr(int);
+int dist_stwr(int);
+d140 3
+a142 3
+int crc_stwr(int);
+int v4root_stwr(int);
+int v4norm_stwr(int);
+d309 1
+a309 1
+int ustar_stwr(int);
+d319 1
+a319 1
+    __attribute__((__format__ (__printf__, 1, 2)));
+d322 1
+a322 1
+    __attribute__((__format__ (__printf__, 2, 3)));
+d324 1
+a324 9
+    __attribute__((__format__ (__printf__, 3, 4)));
+
+/*
+ * part of the OS
+ */
+#ifdef USE_LIBBSD
+size_t strlcat(char *, const char *, size_t);
+size_t strlcpy(char *, const char *, size_t);
+#endif
+@
+
+
+1.1.221.4
+log
+@-rw-r--r--   1 tg  tg  138869 Feb 12 02:14 pax_20120211.orig.tar.gz
+-rw-r--r--   1 tg  tg  136890 Feb 12 02:14 paxmirabilis-20120211.cpio.gz
+@
+text
+@d1 2
+a2 2
+/**	$MirOS: src/bin/pax/extern.h,v 1.16 2012/02/12 00:27:15 tg Exp $ */
+/*	$OpenBSD: extern.h,v 1.34 2010/12/02 04:08:27 tedu Exp $	*/
+a186 1
+void ftree_skipped_newer(void);
+@
+
+
+1.1.221.5
+log
+@-rw-r--r--   1 tg    tg     - 138212 Feb 16 17:54 pax_20120216.orig.tar.gz
+@
+text
+@d1 1
+a1 1
+/**	$MirOS: src/bin/pax/extern.h,v 1.19 2012/02/16 17:27:31 tg Exp $ */
+d49 1
+d66 1
+a66 1
+extern const char *compress_program;
+d199 4
+a202 2
+ot_type asc_ot(char *, int, int);
+int ot_asc(ot_type, char *, int, int);
+a245 1
+extern int Vflag;
+@
+
+
+1.1.221.6
+log
+@pax_20120520.orig.tar.gz
+@
+text
+@d1 1
+a1 1
+/**	$MirOS: src/bin/pax/extern.h,v 1.21 2012/05/20 17:21:44 tg Exp $ */
+d44 4
+a215 1
+void guess_compress_program(int);
+@
+
+
+1.1.221.7
+log
+@import prospective paxmirabilis of today into mircpio debian packaging
+@
+text
+@d1 1
+a1 1
+/**	$MirOS: src/bin/pax/extern.h,v 1.24 2012/06/05 19:09:41 tg Exp $ */
+a321 2
+extern char fdgetline_err;
+char *fdgetline(int);
+d325 1
+a325 1
+char *tty_rd(void);
+d332 1
+a332 1
+ * portability glue
+d334 1
+a334 1
+#ifndef HAVE_STRLCPY
+a337 4
+
+#ifndef HAVE_STRMODE
+void strmode(mode_t, char *);
+#endif
+@
+
+

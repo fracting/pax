@@ -1,0 +1,55 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2011.07.28.17.19.22;	author tg;	state dead;
+branches;
+next	1.1;
+commitid	1004E319A26263D388B;
+
+1.1
+date	2009.12.11.11.27.05;	author tg;	state Exp;
+branches;
+next	;
+commitid	1004B222C9E4C97A674;
+
+
+desc
+@@
+
+
+1.2
+log
+@switch to new packaging style
+@
+text
+@$MirOS: contrib/hosted/tg/deb/mircpio/debian/diffs/use-libbsd.diff,v 1.1 2009/12/11 11:27:05 tg Exp $
+--- extern.h~	2009-10-04 16:51:30.000000000 +0200
++++ extern.h	2009-12-09 18:08:00.000000000 +0100
+@@@@ -45,6 +45,7 @@@@
+ #if defined(__GLIBC__)
+ #include <time.h>
+ #endif
++#include <bsd/bsd.h>
+ 
+ #if !defined(__INTERIX) && !defined(__APPLE__)
+ #define HAS_TAPE	1
+@
+
+
+1.1
+log
+@commit temporary tree
+not working yet, we need libbsd from git, not in debian yet
+also, fill in the XXXes and simplify build/patch system (mksh’s too!)
+@
+text
+@d1 1
+a1 1
+$MirOS$
+@
+

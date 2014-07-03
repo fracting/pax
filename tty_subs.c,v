@@ -1,0 +1,502 @@
+head	1.1;
+branch	1.1.221;
+access;
+symbols
+	pax-20120606-2+deb7u1:1.1.221.7
+	wheezy:1.1.221.7.0.2
+	pax-20120606-3:1.1.221.7
+	pax-20120606-2:1.1.221.7
+	pax-20120606-1:1.1.221.7
+	pax-20120606:1.1.221.7
+	pax-20120605-1:1.1.221.6
+	pax-20120605:1.1.221.6
+	pax-20120520-1:1.1.221.4
+	pax-20120520:1.1.221.4
+	pax-20120216-2:1.1.221.3
+	pax-20120216-1:1.1.221.3
+	pax-20120216:1.1.221.3
+	pax-20120212-1:1.1.221.2
+	pax-20120212:1.1.221.2
+	pax-20120211-1:1.1.221.2
+	pax-20120211:1.1.221.2
+	mircpio_20110817:1.1.221.1
+	mircpio-20091122:1.1.221.1
+	mircpio-20080906:1.1.221.1
+	origtgz:1.1.221;
+locks; strict;
+comment	@ * @;
+expand	@b@;
+
+
+1.1
+date	2011.07.28.16.48.01;	author tg;	state Exp;
+branches
+	1.1.221.1;
+next	;
+commitid	1004E3192C8046E063B;
+
+1.1.221.1
+date	2011.07.28.16.48.01;	author tg;	state Exp;
+branches;
+next	1.1.221.2;
+commitid	1004E3192C8046E063B;
+
+1.1.221.2
+date	2012.02.12.02.23.25;	author tg;	state Exp;
+branches;
+next	1.1.221.3;
+commitid	1004F372297099197B4;
+
+1.1.221.3
+date	2012.02.16.17.57.01;	author tg;	state Exp;
+branches;
+next	1.1.221.4;
+commitid	1004F3D436E207CDFC6;
+
+1.1.221.4
+date	2012.05.20.17.38.57;	author tg;	state Exp;
+branches;
+next	1.1.221.5;
+commitid	1004FB92C473E896F98;
+
+1.1.221.5
+date	2012.06.05.19.32.03;	author tg;	state Exp;
+branches;
+next	1.1.221.6;
+commitid	1004FCE5EBC0C8B75D5;
+
+1.1.221.6
+date	2012.06.05.20.57.03;	author tg;	state Exp;
+branches;
+next	1.1.221.7;
+commitid	1004FCE72B748D684C8;
+
+1.1.221.7
+date	2012.06.05.22.47.18;	author tg;	state Exp;
+branches;
+next	;
+commitid	1004FCE8C850F63D472;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/*	$OpenBSD: tty_subs.c,v 1.12 2003/06/02 23:32:09 millert Exp $	*/
+/*	$NetBSD: tty_subs.c,v 1.5 1995/03/21 09:07:52 cgd Exp $	*/
+
+/*-
+ * Copyright (c) 1992 Keith Muller.
+ * Copyright (c) 1992, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * This code is derived from software contributed to Berkeley by
+ * Keith Muller of the University of California, San Diego.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+#include <sys/param.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <errno.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include "pax.h"
+#include "extern.h"
+#include <stdarg.h>
+
+__SCCSID("@@(#)tty_subs.c	8.2 (Berkeley) 4/18/94");
+__RCSID("$MirOS: src/bin/pax/tty_subs.c,v 1.2 2007/02/17 04:52:41 tg Exp $");
+
+/*
+ * routines that deal with I/O to and from the user
+ */
+
+#define DEVTTY		"/dev/tty"	/* device for interactive i/o */
+static FILE *ttyoutf = NULL;		/* output pointing at control tty */
+static FILE *ttyinf = NULL;		/* input pointing at control tty */
+
+/*
+ * tty_init()
+ *	try to open the controlling terminal (if any) for this process. if the
+ *	open fails, future ops that require user input will get an EOF
+ */
+
+int
+tty_init(void)
+{
+	int ttyfd;
+
+	if ((ttyfd = open(DEVTTY, O_RDWR)) >= 0) {
+		if ((ttyoutf = fdopen(ttyfd, "w")) != NULL) {
+			if ((ttyinf = fdopen(ttyfd, "r")) != NULL)
+				return(0);
+			(void)fclose(ttyoutf);
+		}
+		(void)close(ttyfd);
+	}
+
+	if (iflag) {
+		paxwarn(1, "Fatal error, cannot open %s", DEVTTY);
+		return(-1);
+	}
+	return(0);
+}
+
+/*
+ * tty_prnt()
+ *	print a message using the specified format to the controlling tty
+ *	if there is no controlling terminal, just return.
+ */
+
+void
+tty_prnt(const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	if (ttyoutf == NULL) {
+		va_end(ap);
+		return;
+	}
+	(void)vfprintf(ttyoutf, fmt, ap);
+	va_end(ap);
+	(void)fflush(ttyoutf);
+}
+
+/*
+ * tty_read()
+ *	read a string from the controlling terminal if it is open into the
+ *	supplied buffer
+ * Return:
+ *	0 if data was read, -1 otherwise.
+ */
+
+int
+tty_read(char *str, int len)
+{
+	char *pt;
+
+	if ((--len <= 0) || (ttyinf == NULL) || (fgets(str,len,ttyinf) == NULL))
+		return(-1);
+	*(str + len) = '\0';
+
+	/*
+	 * strip off that trailing newline
+	 */
+	if ((pt = strchr(str, '\n')) != NULL)
+		*pt = '\0';
+	return(0);
+}
+
+/*
+ * paxwarn()
+ *	write a warning message to stderr. if "set" the exit value of pax
+ *	will be non-zero.
+ */
+
+void
+paxwarn(int set, const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	if (set)
+		exit_val = 1;
+	/*
+	 * when vflag we better ship out an extra \n to get this message on a
+	 * line by itself
+	 */
+	if (vflag && vfpart) {
+		(void)fflush(listf);
+		(void)fputc('\n', stderr);
+		vfpart = 0;
+	}
+	(void)fprintf(stderr, "%s: ", argv0);
+	(void)vfprintf(stderr, fmt, ap);
+	va_end(ap);
+	(void)fputc('\n', stderr);
+}
+
+/*
+ * syswarn()
+ *	write a warning message to stderr. if "set" the exit value of pax
+ *	will be non-zero.
+ */
+
+void
+syswarn(int set, int errnum, const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	if (set)
+		exit_val = 1;
+	/*
+	 * when vflag we better ship out an extra \n to get this message on a
+	 * line by itself
+	 */
+	if (vflag && vfpart) {
+		(void)fflush(listf);
+		(void)fputc('\n', stderr);
+		vfpart = 0;
+	}
+	(void)fprintf(stderr, "%s: ", argv0);
+	(void)vfprintf(stderr, fmt, ap);
+	va_end(ap);
+
+	/*
+	 * format and print the errno
+	 */
+	if (errnum > 0)
+		(void)fprintf(stderr, ": %s", strerror(errnum));
+	(void)fputc('\n', stderr);
+}
+@
+
+
+1.1.221.1
+log
+@Import mircpio_20080906.orig.tar.gz
+(even though this package needs a general rework, and -M dirslash too)
+@
+text
+@@
+
+
+1.1.221.2
+log
+@-rw-r--r--   1 tg  tg  138869 Feb 12 02:14 pax_20120211.orig.tar.gz
+-rw-r--r--   1 tg  tg  136890 Feb 12 02:14 paxmirabilis-20120211.cpio.gz
+@
+text
+@d1 1
+a1 1
+/*	$OpenBSD: tty_subs.c,v 1.14 2009/10/27 23:59:22 deraadt Exp $	*/
+d50 2
+a51 1
+__RCSID("$MirOS: src/bin/pax/tty_subs.c,v 1.3 2012/02/12 00:27:19 tg Exp $");
+d120 3
+a122 1
+	if (ttyinf == NULL || fgets(str, len, ttyinf) == NULL)
+d124 1
+d129 2
+a130 1
+	str[strcspn(str, "\n")] = '\0';
+@
+
+
+1.1.221.3
+log
+@-rw-r--r--   1 tg    tg     - 138212 Feb 16 17:54 pax_20120216.orig.tar.gz
+@
+text
+@d50 1
+a50 1
+__RCSID("$MirOS: src/bin/pax/tty_subs.c,v 1.4 2012/02/16 16:01:09 tg Exp $");
+d147 1
+a147 1
+	if (vfpart) {
+d176 1
+a176 1
+	if (vfpart) {
+@
+
+
+1.1.221.4
+log
+@pax_20120520.orig.tar.gz
+@
+text
+@a43 1
+#include <stdarg.h>
+a45 1
+#include <time.h>
+d48 1
+d50 1
+a50 1
+__RCSID("$MirOS: src/bin/pax/tty_subs.c,v 1.5 2012/05/20 16:13:20 tg Exp $");
+@
+
+
+1.1.221.5
+log
+@import prospective paxmirabilis of today into mircpio debian packaging
+@
+text
+@a4 2
+ * Copyright (c) 2012
+ *	Thorsten Glaser <tg@@mirbsd.org>
+a36 1
+#define _GNU_SOURCE
+d51 1
+a51 1
+__RCSID("$MirOS: src/bin/pax/tty_subs.c,v 1.8 2012/06/05 19:19:45 tg Exp $");
+d57 3
+a59 4
+/* device for interactive I/O */
+static const char devtty[] = "/dev/tty";
+/* file descriptor for accessing it */
+static int ttyfd;
+d70 9
+a78 3
+	if ((ttyfd = open(devtty, O_RDWR)) == -1) {
+		paxwarn(1, "Fatal error, cannot open %s", devtty);
+		return (-1);
+d81 5
+a85 1
+	return (0);
+a97 2
+	char *cp;
+	int len;
+d100 3
+a102 6
+	if (ttyfd != -1) {
+		len = vasprintf(&cp, fmt, ap);
+		if (len != -1) {
+			write(ttyfd, cp, len);
+			free(cp);
+		}
+d104 1
+d106 1
+d110 1
+a110 1
+ * tty_rd()
+d114 1
+a114 1
+ *	pointer caller must free if data was read, NULL otherwise.
+d117 2
+a118 2
+char *
+tty_rd(void)
+d120 8
+a127 1
+	return (ttyfd == -1 ? NULL : fdgetline(ttyfd));
+a192 61
+
+/*
+ * fdgetline()
+ *	read a line from a file descriptor, similar to fgetln(3).
+ *	caller must free(3) the result string.
+ */
+
+char fdgetline_err;
+
+char *
+fdgetline(int fd)
+{
+	size_t n = 0;
+	char *rv = NULL;
+	size_t z = 32;
+	ssize_t rdr;
+	char *np;
+
+	goto fdgetline_alloc;
+
+	do {
+		if (n == z) {
+			z <<= 1;
+			if (z < n) {
+				/* overflow */
+				break;
+			}
+ fdgetline_alloc:
+			if ((np = realloc(rv, z)) == NULL) {
+				/* allocation error */
+				break;
+			}
+			rv = np;
+		}
+
+		rdr = read(fd, rv + n, 1);
+		if (rdr == 0 && n == 0) {
+			/* EOF reached, but nothing ever read */
+			free(rv);
+			rv = NULL;
+			goto fdgetline_eod;
+		}
+		if (rdr == 0 || (rdr == 1 && rv[n] == '\n')) {
+			/* EOF or EOL */
+			rv[n++] = 0;
+			if ((np = realloc(rv, n)) != NULL)
+				rv = np;
+ fdgetline_eod:
+			fdgetline_err = 0;
+			return (rv);
+		}
+		++n;
+	} while (rdr == 1);
+
+	/* fall through do-while if rdr > 1 (read too much) or < 0 (error) */
+	/* get here via break on memory allocation errors */
+
+	free(rv);
+	fdgetline_err = 1;
+	return (NULL);
+}
+@
+
+
+1.1.221.6
+log
+@Message-ID: <201206052044.q55KiZ9H022064@@herc.mirbsd.org>
+@
+text
+@d54 1
+a54 1
+__RCSID("$MirOS: src/bin/pax/tty_subs.c,v 1.9 2012/06/05 20:20:28 tg Exp $");
+a98 4
+#ifdef _FORTIFY_SOURCE
+			/* booh */
+			len = write(ttyfd, cp, len);
+#else
+a99 1
+#endif
+@
+
+
+1.1.221.7
+log
+@new upstream, quick!
+@
+text
+@d54 1
+a54 1
+__RCSID("$MirOS: src/bin/pax/tty_subs.c,v 1.10 2012/06/05 22:41:55 tg Exp $");
+d74 1
+a74 1
+	if ((ttyfd = open(devtty, O_RDWR)) == -1 && iflag) {
+@
+
+

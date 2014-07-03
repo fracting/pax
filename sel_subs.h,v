@@ -1,0 +1,153 @@
+head	1.1;
+branch	1.1.221;
+access;
+symbols
+	pax-20120606-2+deb7u1:1.1.221.2
+	wheezy:1.1.221.2.0.2
+	pax-20120606-3:1.1.221.2
+	pax-20120606-2:1.1.221.2
+	pax-20120606-1:1.1.221.2
+	pax-20120606:1.1.221.2
+	pax-20120605-1:1.1.221.2
+	pax-20120605:1.1.221.2
+	pax-20120520-1:1.1.221.2
+	pax-20120520:1.1.221.2
+	pax-20120216-2:1.1.221.2
+	pax-20120216-1:1.1.221.2
+	pax-20120216:1.1.221.2
+	pax-20120212-1:1.1.221.2
+	pax-20120212:1.1.221.2
+	pax-20120211-1:1.1.221.2
+	pax-20120211:1.1.221.2
+	mircpio_20110817:1.1.221.1
+	mircpio-20091122:1.1.221.1
+	mircpio-20080906:1.1.221.1
+	origtgz:1.1.221;
+locks; strict;
+comment	@ * @;
+expand	@b@;
+
+
+1.1
+date	2011.07.28.16.48.00;	author tg;	state Exp;
+branches
+	1.1.221.1;
+next	;
+commitid	1004E3192C8046E063B;
+
+1.1.221.1
+date	2011.07.28.16.48.00;	author tg;	state Exp;
+branches;
+next	1.1.221.2;
+commitid	1004E3192C8046E063B;
+
+1.1.221.2
+date	2012.02.12.02.23.22;	author tg;	state Exp;
+branches;
+next	;
+commitid	1004F372297099197B4;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/*	$OpenBSD: sel_subs.h,v 1.4 2003/06/02 23:32:09 millert Exp $	*/
+/*	$NetBSD: sel_subs.h,v 1.3 1995/03/21 09:07:44 cgd Exp $	*/
+
+/*-
+ * Copyright (c) 1992 Keith Muller.
+ * Copyright (c) 1992, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * This code is derived from software contributed to Berkeley by
+ * Keith Muller of the University of California, San Diego.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *	@@(#)sel_subs.h	8.1 (Berkeley) 5/31/93
+ */
+
+/*
+ * data structure for storing uid/grp selects (-U, -G non standard options)
+ */
+
+#define USR_TB_SZ	317		/* user selection table size */
+#define GRP_TB_SZ	317		/* user selection table size */
+
+typedef struct usrt {
+	uid_t uid;
+	struct usrt *fow;		/* next uid */
+} USRT;
+
+typedef struct grpt {
+	gid_t gid;
+	struct grpt *fow;		/* next gid */
+} GRPT;
+
+/*
+ * data structure for storing user supplied time ranges (-T option)
+ */
+
+#define ATOI2(ar)	((ar)[0] - '0') * 10 + ((ar)[1] - '0'); (ar) += 2;
+
+typedef struct time_rng {
+	time_t		low_time;	/* lower inclusive time limit */
+	time_t		high_time;	/* higher inclusive time limit */
+	int		flgs;		/* option flags */
+#define	HASLOW		0x01		/* has lower time limit */
+#define HASHIGH		0x02		/* has higher time limit */
+#define CMPMTME		0x04		/* compare file modification time */
+#define CMPCTME		0x08		/* compare inode change time */
+#define CMPBOTH	(CMPMTME|CMPCTME)	/* compare inode and mod time */
+	struct time_rng	*fow;		/* next pattern */
+} TIME_RNG;
+@
+
+
+1.1.221.1
+log
+@Import mircpio_20080906.orig.tar.gz
+(even though this package needs a general rework, and -M dirslash too)
+@
+text
+@@
+
+
+1.1.221.2
+log
+@-rw-r--r--   1 tg  tg  138869 Feb 12 02:14 pax_20120211.orig.tar.gz
+-rw-r--r--   1 tg  tg  136890 Feb 12 02:14 paxmirabilis-20120211.cpio.gz
+@
+text
+@a0 1
+/**	$MirOS: src/bin/pax/sel_subs.h,v 1.2 2012/02/12 00:27:18 tg Exp $ */
+@
+

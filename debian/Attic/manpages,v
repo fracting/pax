@@ -1,0 +1,166 @@
+head	1.4;
+access;
+symbols
+	pax-20120520-1:1.3
+	pax-20120216-2:1.3
+	pax-20120216-1:1.3
+	pax-20120212-1:1.3
+	pax-20120211-1:1.3;
+locks; strict;
+comment	@# @;
+
+
+1.4
+date	2012.06.05.20.56.10;	author tg;	state dead;
+branches;
+next	1.3;
+commitid	1004FCE72810F9C6F4A;
+
+1.3
+date	2012.02.12.02.23.51;	author tg;	state Exp;
+branches;
+next	1.2;
+commitid	1004F3722CE39A146EE;
+
+1.2
+date	2011.08.16.14.37.45;	author tg;	state Exp;
+branches;
+next	1.1;
+commitid	1004E4A80BA5E613817;
+
+1.1
+date	2009.11.22.22.08.52;	author tg;	state Exp;
+branches;
+next	;
+commitid	1004B09B67E4C994FE3;
+
+
+desc
+@@
+
+
+1.4
+log
+@empty out B-D
+@
+text
+@# $MirOS: contrib/hosted/tg/deb/mircpio/debian/manpages,v 1.3 2012/02/12 02:23:51 tg Exp $
+#-
+debian/pax.1
+debian/paxcpio.1
+debian/paxtar.1
+@
+
+
+1.3
+log
+@prepare upload to Debian unstable
+@
+text
+@d1 1
+a1 1
+# $MirOS: contrib/hosted/tg/deb/mircpio/debian/manpages,v 1.2 2011/08/16 14:37:45 tg Exp $
+@
+
+
+1.2
+log
+@let’s see what lintian says to this, and which compiler warnings we get
+(note: upstream source in ../ not updated yet)
+@
+text
+@d1 1
+a1 1
+# $MirOS$
+d3 3
+a5 3
+mircpio.1
+mirpax.1
+mirtar.1
+@
+
+
+1.1
+log
+@dump almost all of the MirDebian “WTF” Repository in here
+for further improvements, backups, collaboration possibilities, etc.
+CVS: ----------------------------------------------------------------------
+CVS: ATTENTION: read-only mode selected!
+CVS: Enter Log.  Lines beginning with `CVS:' are removed automatically
+CVS:
+CVS: Committing in .
+CVS:
+CVS: Added Files:
+CVS: 	ca-bundle/bsd/certdata.txt ca-bundle/bsd/keystore.jks
+CVS: 	ca-bundle/bsd/ksslcalist ca-bundle/bsd/ssl.certs.shar
+CVS: 	ca-bundle/debian/ca-bundle.install
+CVS: 	ca-bundle/debian/ca-bundle.links
+CVS: 	ca-bundle/debian/ca-bundle.manpages
+CVS: 	ca-bundle/debian/ca-bundle.postinst
+CVS: 	ca-bundle/debian/ca-bundle.postrm ca-bundle/debian/changelog
+CVS: 	ca-bundle/debian/compat ca-bundle/debian/control
+CVS: 	ca-bundle/debian/copyright ca-bundle/debian/rules
+CVS: 	ca-bundle/debian/source.lintian-overrides
+CVS: 	ca-bundle/debian/lintian/ca-bundle
+CVS: 	ca-bundle/sbin/update-ca-certificates
+CVS: 	ca-bundle/sbin/update-ca-certificates.8
+CVS: 	mbsd-bug/debian/NOTE.crtstuff mbsd-bug/debian/NOTE.sysroot
+CVS: 	mbsd-bug/debian/PKG.install
+CVS: 	mbsd-bug/debian/PKG.lintian-overrides
+CVS: 	mbsd-bug/debian/changelog mbsd-bug/debian/compat
+CVS: 	mbsd-bug/debian/control mbsd-bug/debian/copyright
+CVS: 	mbsd-bug/debian/mirdefs.h mbsd-bug/debian/rules
+CVS: 	mbsd-bug/debian/source.lintian-overrides
+CVS: 	mircpio/debian/changelog mircpio/debian/compat
+CVS: 	mircpio/debian/control mircpio/debian/copyright
+CVS: 	mircpio/debian/install mircpio/debian/manpages
+CVS: 	mircpio/debian/rules mircpio/debian/watch
+CVS: 	mircpio/debian/diffs/extern.h.diff mirmake/debian/changelog
+CVS: 	mirmake/debian/compat mirmake/debian/control
+CVS: 	mirmake/debian/copyright mirmake/debian/instnames.ed
+CVS: 	mirmake/debian/mirmake.install mirmake/debian/mirmake.manpages
+CVS: 	mirmake/debian/rules mirmake/debian/watch
+CVS: 	openntpd/debian/changelog openntpd/debian/compat
+CVS: 	openntpd/debian/control openntpd/debian/copyright
+CVS: 	openntpd/debian/ntp.conf openntpd/debian/ntp.cron.daily
+CVS: 	openntpd/debian/ntp.default openntpd/debian/ntp.dhcp
+CVS: 	openntpd/debian/ntp.init openntpd/debian/ntpdate.default
+CVS: 	openntpd/debian/ntpdate.dhcp openntpd/debian/ntpdate.if-up
+CVS: 	openntpd/debian/openntpd.default openntpd/debian/openntpd.docs
+CVS: 	openntpd/debian/openntpd.init
+CVS: 	openntpd/debian/openntpd.postinst
+CVS: 	openntpd/debian/openntpd.postrm openntpd/debian/openntpd.prerm
+CVS: 	openntpd/debian/rules openntpd/debian/source.lintian-overrides
+CVS: 	openntpd/debian/watch openntpd/debian/patches/00list
+CVS: 	openntpd/debian/patches/01-config.dpatch
+CVS: 	openntpd/debian/patches/02-reconnect.dpatch
+CVS: 	openntpd/debian/patches/03-ipv4only.patch
+CVS: 	openntpd/debian/patches/04-backslash.patch
+CVS: 	openntpd/debian/patches/05-mirtropy.dpatch
+CVS: 	openntpd/debian/patches/06-libbsd.dpatch
+CVS: 	openntpd/debian/patches/07-fixsympas.dpatch
+CVS: 	openntpd/debian/patches/openntpd-3.9p1-linux-adjtimex.diff
+CVS: 	openntpd/debian/script/openntpd php-perl/debian/changelog
+CVS: 	php-perl/debian/changelog.xsl php-perl/debian/compat
+CVS: 	php-perl/debian/control php-perl/debian/copyright
+CVS: 	php-perl/debian/docs php-perl/debian/pecl
+CVS: 	php-perl/debian/perl.ini php-perl/debian/php5-perl.dirs
+CVS: 	php-perl/debian/rules php-perl/debian/watch
+CVS: 	wtf-debian-keyring/debian/changelog
+CVS: 	wtf-debian-keyring/debian/control
+CVS: 	wtf-debian-keyring/debian/copyright
+CVS: 	wtf-debian-keyring/debian/postinst
+CVS: 	wtf-debian-keyring/debian/prerm
+CVS: 	wtf-debian-keyring/debian/rules
+CVS: 	wtf-debian-keyring/keyrings/wtf-debian-keyring.gpg
+CVS: 	wtf-debian-keyring/keyrings/wtf-debian-removed-keys.gpg
+CVS: ----------------------------------------------------------------------
+@
+text
+@d1 5
+a5 3
+cpio.1
+pax.1
+tar.1
+@
+

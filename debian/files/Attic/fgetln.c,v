@@ -1,0 +1,122 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.3
+date	2009.12.11.11.27.07;	author tg;	state dead;
+branches;
+next	1.2;
+commitid	1004B222C9E4C97A674;
+
+1.2
+date	2009.11.22.22.15.35;	author tg;	state Exp;
+branches;
+next	1.1;
+commitid	1004B09B7FE6973D17F;
+
+1.1
+date	2009.11.22.22.00.11;	author tg;	state Exp;
+branches;
+next	;
+commitid	1004B09B47C64D45727;
+
+
+desc
+@@
+
+
+1.3
+log
+@commit temporary tree
+not working yet, we need libbsd from git, not in debian yet
+also, fill in the XXXes and simplify build/patch system (mksh’s too!)
+@
+text
+@$MirOS: contrib/hosted/tg/deb/mircpio/debian/files/fgetln.c,v 1.2 2009/11/22 22:15:35 tg Exp $
+
+placeholder: pull from ↓ instead!
+
+mircvs://contrib/code/mirmake/dist/contrib/fgetln.c
+@
+
+
+1.2
+log
+@since FreeWRT still uses Suckwürstchen, which hasn’t managed in
+how-many-years to get RCS IDs, the master copies of these files
+shall henceforth be in the MirCVS Repository
+@
+text
+@d1 1
+a1 1
+$MirOS$
+@
+
+
+1.1
+log
+@copy svn+ssh://www.freewrt.org/svn/trunk/freewrt/tools/paxmirabilis@@3903
+@
+text
+@d1 1
+a1 1
+/* $FreeWRT: contrib/code/mirmake/dist/contrib/fgetln.c,v 1.5 2009/05/20 10:40:28 tg Exp $ */
+d3 1
+a3 21
+/*-
+ * Copyright (c) 2007
+ *	Thorsten Glaser <tg@@mirbsd.de>
+ *
+ * Provided that these terms and disclaimer and all copyright notices
+ * are retained or reproduced in an accompanying document, permission
+ * is granted to deal in this work without restriction, including un-
+ * limited rights to use, publicly perform, distribute, sell, modify,
+ * merge, give away, or sublicence.
+ *
+ * This work is provided "AS IS" and WITHOUT WARRANTY of any kind, to
+ * the utmost extent permitted by applicable law, neither express nor
+ * implied; without malicious intent or gross negligence. In no event
+ * may a licensor, author or contributor be held liable for indirect,
+ * direct, other damage, loss, or other issues arising in any way out
+ * of dealing in the work, even if advised of the possibility of such
+ * damage or existence of a defect, except proven that it results out
+ * of said person's immediate fault when using the work as intended.
+ *-
+ * fgetln() wrapper for operating systems with getline() – glibc
+ */
+d5 1
+a5 29
+#define _GNU_SOURCE		/* for getline() */
+#include <sys/types.h>
+#include <stdio.h>
+#include <string.h>
+
+__RCSID("$MirOS: contrib/code/mirmake/dist/contrib/fgetln.c,v 1.5 2009/05/20 10:40:28 tg Exp $");
+
+#if defined(__GLIBC__)
+
+#if !defined(_MIRMAKE_H) || !defined(_MIRMAKE_DEFNS)
+char *fgetln(FILE *, size_t *);
+#endif
+
+char *
+fgetln(FILE *stream, size_t *len)
+{
+	static char *lb = NULL;
+	static size_t lbsz = 0;
+
+	if ((*len = getline(&lb, &lbsz, stream)) != (size_t)-1)
+		return (lb);
+
+	/* not required by manpage, but reference implementation does this */
+	*len = 0;
+
+	/* not required to zero lb or lbsz: getdelim manages it */
+	return (NULL);
+}
+#endif
+@
+
