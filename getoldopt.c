@@ -1,4 +1,4 @@
-/*	$OpenBSD: getoldopt.c,v 1.8 2003/07/02 21:19:33 deraadt Exp $	*/
+/*	$OpenBSD: getoldopt.c,v 1.9 2009/10/27 23:59:22 deraadt Exp $	*/
 /*	$NetBSD: getoldopt.c,v 1.3 1995/03/21 09:07:28 cgd Exp $	*/
 
 /*
@@ -10,15 +10,16 @@
  * in the Public Domain for your edification and enjoyment.
  */
 
-#include <sys/types.h>
+#include <sys/param.h>
 #include <sys/stat.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 #include "pax.h"
 #include "extern.h"
 
-__RCSID("$MirOS: src/bin/pax/getoldopt.c,v 1.2 2007/02/17 04:52:40 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/getoldopt.c,v 1.5 2012/05/20 16:13:18 tg Exp $");
 
 int
 getoldopt(int argc, char **argv, const char *optstring)

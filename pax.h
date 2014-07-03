@@ -1,8 +1,10 @@
-/**	$MirOS: src/bin/pax/pax.h,v 1.7 2008/03/14 15:55:21 tg Exp $ */
+/**	$MirOS: src/bin/pax/pax.h,v 1.12 2012/02/16 17:27:32 tg Exp $ */
 /*	$OpenBSD: pax.h,v 1.17 2005/11/09 19:59:06 otto Exp $	*/
 /*	$NetBSD: pax.h,v 1.3 1995/03/21 09:07:41 cgd Exp $	*/
 
 /*-
+ * Copyright (c) 2011, 2012
+ *	Thorsten Glaser <tg@debian.org>
  * Copyright (c) 1992 Keith Muller.
  * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -53,7 +55,7 @@
 				/* longer than the system MAXPATHLEN */
 
 /*
- * Pax modes of operation
+ * pax modes of operation
  */
 #define ERROR		-1	/* nothing selected */
 #define	LIST		0	/* List the file in an archive */
@@ -167,7 +169,7 @@ typedef struct {
 				/* in invalid headers (i.e like tar) */
 	int (*id)(char *,	/* checks if a buffer is a valid header */
 	    int);		/* returns 1 if it is, o.w. returns a 0 */
-	int (*st_rd)(void);	/* initialize routine for read. so format */
+	int (*st_rd)(void);	/* initialise routine for read. so format */
 				/* can set up tables etc before it starts */
 				/* reading an archive */
 	int (*rd)(ARCHD *,	/* read header routine. passed a pointer to */
@@ -186,7 +188,7 @@ typedef struct {
 				/* and MUST RETURN THE LENGTH OF THE TRAILER */
 				/* RECORD (so append knows how many bytes */
 				/* to move back to rewrite the trailer) */
-	int (*st_wr)(void);	/* initialize routine for write operations */
+	int (*st_wr)(int);	/* initialise routine for write operations */
 	int (*wr)(ARCHD *);	/* write archive header. Passed an ARCHD */
 				/* filled with the specs on the next file to */
 				/* archived. Returns a 1 if no file data is */
@@ -214,6 +216,7 @@ typedef struct {
 	int (*wr_data)(ARCHD *,	/* write/process file data to the archive */
 	    int, off_t *);
 	int (*options)(void);	/* process format specific options (-o) */
+	char is_uar;		/* is Unix Archiver (sequential, no trailer) */
 } FSUB;
 
 /*
@@ -231,7 +234,7 @@ typedef struct oplist {
  * General Macros
  */
 #ifndef MIN
-#define	MIN(a,b) (((a)<(b))?(a):(b))
+#define MIN(a,b)	(((a)<(b))?(a):(b))
 #endif
 #ifdef __INTERIX
 #include <sys/mkdev.h>
@@ -239,9 +242,45 @@ typedef struct oplist {
 #define MAJOR(x)	major(x)
 #define MINOR(x)	minor(x)
 #ifdef __INTERIX
-#define	TODEV(x, y)	mkdev((x), (y))
+#define TODEV		mkdev
 #else
-#define TODEV(x, y)	makedev((x), (y))
+#define TODEV		makedev
+#endif
+
+#if !defined(__INTERIX) && !defined(__APPLE__)
+#define HAS_TAPE	1
+#else
+#define HAS_TAPE	0
+#endif
+
+#if defined(MirBSD) && (MirBSD >= 0x09A1) && \
+    defined(__ELF__) && defined(__GNUC__) && \
+    !defined(__llvm__) && !defined(__NWCC__)
+/*
+ * We got usable __IDSTRING __COPYRIGHT __RCSID __SCCSID macros
+ * which work for all cases; no need to redefine them using the
+ * "portable" macros from below when we might have the "better"
+ * gcc+ELF specific macros or other system dependent ones.
+ */
+#else
+#undef __IDSTRING
+#undef __IDSTRING_CONCAT
+#undef __IDSTRING_EXPAND
+#undef __COPYRIGHT
+#undef __RCSID
+#undef __SCCSID
+#define __IDSTRING_CONCAT(l,p)		__LINTED__ ## l ## _ ## p
+#define __IDSTRING_EXPAND(l,p)		__IDSTRING_CONCAT(l,p)
+#ifdef MKSH_DONT_EMIT_IDSTRING
+#define __IDSTRING(prefix, string)	/* nothing */
+#else
+#define __IDSTRING(prefix, string)				\
+	static const char __IDSTRING_EXPAND(__LINE__,prefix) []	\
+	    __attribute__((__used__)) = "@(""#)" #prefix ": " string
+#endif
+#define __COPYRIGHT(x)		__IDSTRING(copyright,x)
+#define __RCSID(x)		__IDSTRING(rcsid,x)
+#define __SCCSID(x)		__IDSTRING(sccsid,x)
 #endif
 
 /*
@@ -258,5 +297,13 @@ typedef struct oplist {
 #define HOURSPERDAY	24
 #define DAYSPERNYEAR	365
 #define SECSPERHOUR	(SECSPERMIN * MINSPERHOUR)
-#define SECSPERDAY	((long) SECSPERHOUR * HOURSPERDAY)
+#define SECSPERDAY	((long)SECSPERHOUR * HOURSPERDAY)
 #define TM_YEAR_BASE	1900
+
+#ifndef LONG_OFF_T
+#define OT_FMT		"llu"
+typedef unsigned long long ot_type;
+#else
+#define OT_FMT		"lu"
+typedef unsigned long ot_type;
+#endif

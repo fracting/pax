@@ -1,5 +1,5 @@
-/**	$MirOS: src/bin/pax/extern.h,v 1.15 2011/08/16 21:32:47 tg Exp $ */
-/*	$OpenBSD: extern.h,v 1.32 2006/11/17 08:38:04 otto Exp $	*/
+/**	$MirOS: src/bin/pax/extern.h,v 1.24 2012/06/05 19:09:41 tg Exp $ */
+/*	$OpenBSD: extern.h,v 1.34 2010/12/02 04:08:27 tedu Exp $	*/
 /*	$NetBSD: extern.h,v 1.5 1996/03/26 23:54:16 mrg Exp $	*/
 
 /*-
@@ -41,11 +41,6 @@
  * External references from each source file
  */
 
-#include <sys/cdefs.h>
-#if defined(__GLIBC__)
-#include <time.h>
-#endif
-
 
 /*
  * ar.c
@@ -63,7 +58,7 @@ int uar_trail(ARCHD *, char *, int, int *) __attribute__((__noreturn__));
  * ar_io.c
  */
 extern const char *arcname;
-extern const char *gzip_program;
+extern const char *compress_program;
 extern int force_one_volume;
 int ar_open(const char *);
 void ar_close(void);
@@ -184,6 +179,7 @@ int set_crc(ARCHD *, int);
 int ftree_start(void);
 int ftree_add(char *, int);
 void ftree_sel(ARCHD *);
+void ftree_skipped_newer(void);
 void ftree_chk(void);
 int next_file(ARCHD *);
 
@@ -195,10 +191,8 @@ void ls_tty(ARCHD *);
 void safe_print(const char *, FILE *);
 u_long asc_ul(char *, int, int);
 int ul_asc(u_long, char *, int, int);
-#ifndef LONG_OFF_T
-u_quad_t asc_uqd(char *, int, int);
-int uqd_asc(u_quad_t, char *, int, int);
-#endif
+ot_type asc_ot(char *, int, int);
+int ot_asc(ot_type, char *, int, int);
 size_t fieldcpy(char *, size_t, const char *, size_t);
 
 /*
@@ -215,6 +209,7 @@ void options(int, char **);
 OPLIST * opt_next(void);
 int opt_add(const char *);
 int bad_opt(void);
+void guess_compress_program(int);
 char *chdname;
 
 /*
@@ -242,6 +237,7 @@ extern int lflag;
 extern int nflag;
 extern int tflag;
 extern int uflag;
+extern int Vflag;
 extern int vflag;
 extern int Dflag;
 extern int Hflag;
@@ -323,19 +319,25 @@ int ustar_wr(ARCHD *);
 /*
  * tty_subs.c
  */
+extern char fdgetline_err;
+char *fdgetline(int);
 int tty_init(void);
 void tty_prnt(const char *, ...)
     __attribute__((__format__ (__printf__, 1, 2)));
-int tty_read(char *, int);
+char *tty_rd(void);
 void paxwarn(int, const char *, ...)
     __attribute__((__format__ (__printf__, 2, 3)));
 void syswarn(int, int, const char *, ...)
     __attribute__((__format__ (__printf__, 3, 4)));
 
 /*
- * part of the OS
+ * portability glue
  */
-#ifdef USE_LIBBSD
+#ifndef HAVE_STRLCPY
 size_t strlcat(char *, const char *, size_t);
 size_t strlcpy(char *, const char *, size_t);
+#endif
+
+#ifndef HAVE_STRMODE
+void strmode(mode_t, char *);
 #endif

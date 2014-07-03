@@ -1,4 +1,4 @@
-/*	$OpenBSD: pat_rep.c,v 1.30 2005/08/05 08:30:10 djm Exp $	*/
+/*	$OpenBSD: pat_rep.c,v 1.31 2009/10/27 23:59:22 deraadt Exp $	*/
 /*	$NetBSD: pat_rep.c,v 1.4 1995/03/21 09:07:33 cgd Exp $	*/
 
 /*-
@@ -43,12 +43,12 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <regex.h>
+#include <time.h>
 #include "pax.h"
 #include "pat_rep.h"
 #include "extern.h"
 
-__SCCSID("@(#)pat_rep.c	8.2 (Berkeley) 4/18/94");
-__RCSID("$MirOS: src/bin/pax/pat_rep.c,v 1.2 2007/02/17 04:52:41 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/pat_rep.c,v 1.6 2012/06/05 19:09:41 tg Exp $");
 
 /*
  * routines to handle pattern matching, name modification (regular expression
@@ -524,7 +524,7 @@ fn_match(char *pattern, char *string, char **pend)
 				c = *++pattern;
 
 			/*
-			 * Optimized hack for pattern with a * at the end
+			 * optimised hack for pattern with a * at the end
 			 */
 			if (c == '\0')
 				return (0);
@@ -695,8 +695,8 @@ mod_name(ARCHD *arcn)
 static int
 tty_rename(ARCHD *arcn)
 {
-	char tmpname[PAXPATHLEN+2];
 	int res;
+	char *tmpname;
 
 	/*
 	 * prompt user for the replacement name for a file, keep trying until
@@ -711,14 +711,16 @@ tty_rename(ARCHD *arcn)
 		tty_prnt("Input new name, or a \".\" to keep the old name, ");
 		tty_prnt("or a \"return\" to skip this file.\n");
 		tty_prnt("Input > ");
-		if (tty_read(tmpname, sizeof(tmpname)) < 0)
-			return(-1);
+		if ((tmpname = tty_rd()) == NULL)
+			return (-1);
 		if (strcmp(tmpname, "..") == 0) {
 			tty_prnt("Try again, illegal file name: ..\n");
+			free(tmpname);
 			continue;
 		}
 		if (strlen(tmpname) > PAXPATHLEN) {
 			tty_prnt("Try again, file name too long\n");
+			free(tmpname);
 			continue;
 		}
 		break;
@@ -729,11 +731,13 @@ tty_rename(ARCHD *arcn)
 	 */
 	if (tmpname[0] == '\0') {
 		tty_prnt("Skipping file.\n");
-		return(1);
+		free(tmpname);
+		return (1);
 	}
 	if ((tmpname[0] == '.') && (tmpname[1] == '\0')) {
 		tty_prnt("Processing continues, name unchanged.\n");
-		return(0);
+		free(tmpname);
+		return (0);
 	}
 
 	/*
@@ -746,9 +750,10 @@ tty_rename(ARCHD *arcn)
 	arcn->nlen = strlcpy(arcn->name, tmpname, sizeof(arcn->name));
 	if ((size_t)arcn->nlen >= sizeof(arcn->name))
 		arcn->nlen = sizeof(arcn->name) - 1; /* XXX truncate? */
+	free(tmpname);
 	if (res < 0)
-		return(-1);
-	return(0);
+		return (-1);
+	return (0);
 }
 
 /*
@@ -836,7 +841,7 @@ fix_path(char *or_name, int *or_len, char *dir_name, int dir_len)
  *	when we find one with a successful substitution, we modify the name
  *	as specified. if required, we print the results. if the resulting name
  *	is empty, we will skip this archive member. We use the regexp(3)
- *	routines (regexp() ought to win a prize as having the most cryptic
+ *	routines (regexp() ought to win a price as having the most cryptic
  *	library function manual page).
  *	--Parameters--
  *	name is the file name we are going to apply the regular expressions to

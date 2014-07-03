@@ -1,9 +1,9 @@
-/**	$MirOS: src/bin/pax/tar.c,v 1.4 2007/02/17 04:52:41 tg Exp $ */
-/*	$OpenBSD: tar.c,v 1.41 2006/03/04 20:24:55 otto Exp $	*/
+/*	$OpenBSD: tar.c,v 1.43 2010/12/02 04:08:27 tedu Exp $	*/
 /*	$NetBSD: tar.c,v 1.5 1995/03/21 09:07:49 cgd Exp $	*/
 
 /*-
- * Copyright (c) 2006 Thorsten Glaser.
+ * Copyright (c) 2006, 2012
+ *	Thorsten Glaser <tg@mirbsd.org>
  * Copyright (c) 1992 Keith Muller.
  * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -43,13 +43,13 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <time.h>
 #include "pax.h"
 #include "extern.h"
 #include "tar.h"
 #include "options.h"
 
-__SCCSID("@(#)tar.c	8.2 (Berkeley) 4/18/94");
-__RCSID("$MirOS: src/bin/pax/tar.c,v 1.4 2007/02/17 04:52:41 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/tar.c,v 1.14 2012/06/05 18:22:58 tg Exp $");
 
 /*
  * Routines for reading, writing and header identify of various versions of tar
@@ -59,9 +59,7 @@ static size_t expandname(char *, size_t, char **, const char *, size_t);
 static u_long tar_chksm(char *, int);
 static char *name_split(char *, int);
 static int ul_oct(u_long, char *, int, int);
-#ifndef LONG_OFF_T
-static int uqd_oct(u_quad_t, char *, int, int);
-#endif
+static int ot_oct(ot_type, char *, int, int);
 
 static void tar_dbgfld(const char *, const char *, size_t);
 
@@ -116,8 +114,8 @@ tar_endrd(void)
  */
 
 int
-tar_trail(ARCHD *ignore __attribute__((unused)), char *buf, int in_resync,
-    int *cnt)
+tar_trail(ARCHD *ignore __attribute__((__unused__)), char *buf,
+    int in_resync, int *cnt)
 {
 	int i;
 
@@ -202,20 +200,19 @@ ul_oct(u_long val, char *str, int len, int term)
 	return(0);
 }
 
-#ifndef LONG_OFF_T
 /*
- * uqd_oct()
- *	convert an u_quad_t to an octal string. one of many oddball field
- *	termination characters are used by the various versions of tar in the
- *	different fields. term selects which kind to use. str is '0' padded
- *	at the front to len. we are unable to use only one format as many old
- *	tar readers are very cranky about this.
+ * ot_oct()
+ *	convert an ot_type to an octal string. one of many oddball
+ *	field termination characters are used by the various versions
+ *	of tar in the different fields. term selects which kind to use.
+ *	str is '0' padded at the front to len. we are unable to use only
+ *	one format as many old tar readers are very cranky about this.
  * Return:
  *	0 if the number fit into the string, -1 otherwise
  */
 
 static int
-uqd_oct(u_quad_t val, char *str, int len, int term)
+ot_oct(ot_type val, char *str, int len, int term)
 {
 	char *pt;
 
@@ -252,11 +249,10 @@ uqd_oct(u_quad_t val, char *str, int len, int term)
 
 	while (pt >= str)
 		*pt-- = '0';
-	if (val != (u_quad_t)0)
-		return(-1);
-	return(0);
+	if (val != (ot_type)0)
+		return (-1);
+	return (0);
 }
-#endif
 
 /*
  * tar_chksm()
@@ -410,11 +406,7 @@ tar_rd(ARCHD *arcn, char *buf)
 	    0xfff);
 	arcn->sb.st_uid = (uid_t)asc_ul(hd->uid, sizeof(hd->uid), OCT);
 	arcn->sb.st_gid = (gid_t)asc_ul(hd->gid, sizeof(hd->gid), OCT);
-#ifdef LONG_OFF_T
-	arcn->sb.st_size = (off_t)asc_ul(hd->size, sizeof(hd->size), OCT);
-#else
-	arcn->sb.st_size = (off_t)asc_uqd(hd->size, sizeof(hd->size), OCT);
-#endif
+	arcn->sb.st_size = (off_t)asc_ot(hd->size, sizeof(hd->size), OCT);
 	arcn->sb.st_mtime = (time_t)asc_ul(hd->mtime, sizeof(hd->mtime), OCT);
 	arcn->sb.st_ctime = arcn->sb.st_atime = arcn->sb.st_mtime;
 
@@ -537,17 +529,17 @@ tar_wr(ARCHD *arcn)
 			return(1);
 		break;
 	case PAX_CHR:
-		paxwarn(1, "Tar cannot archive a character device %s",
+		paxwarn(1, "tar cannot archive a character device %s",
 		    arcn->org_name);
 		return(1);
 	case PAX_BLK:
-		paxwarn(1, "Tar cannot archive a block device %s", arcn->org_name);
+		paxwarn(1, "tar cannot archive a block device %s", arcn->org_name);
 		return(1);
 	case PAX_SCK:
-		paxwarn(1, "Tar cannot archive a socket %s", arcn->org_name);
+		paxwarn(1, "tar cannot archive a socket %s", arcn->org_name);
 		return(1);
 	case PAX_FIF:
-		paxwarn(1, "Tar cannot archive a fifo %s", arcn->org_name);
+		paxwarn(1, "tar cannot archive a fifo %s", arcn->org_name);
 		return(1);
 	case PAX_SLK:
 	case PAX_HLK:
@@ -621,13 +613,7 @@ tar_wr(ARCHD *arcn)
 		 * data follows this file, so set the pad
 		 */
 		hd->linkflag = AREGTYPE;
-#		ifdef LONG_OFF_T
-		if (ul_oct((u_long)arcn->sb.st_size, hd->size,
-		    sizeof(hd->size), 1)) {
-#		else
-		if (uqd_oct((u_quad_t)arcn->sb.st_size, hd->size,
-		    sizeof(hd->size), 1)) {
-#		endif
+		if (ot_oct(arcn->sb.st_size, hd->size, sizeof(hd->size), 1)) {
 			paxwarn(1,"File is too large for tar %s", arcn->org_name);
 			return(1);
 		}
@@ -659,11 +645,11 @@ tar_wr(ARCHD *arcn)
 		return(0);
 	return(1);
 
-    out:
+ out:
 	/*
 	 * header field is out of range
 	 */
-	paxwarn(1, "Tar header field is too small for %s", arcn->org_name);
+	paxwarn(1, "tar header field is too small for %s", arcn->org_name);
 	return(1);
 }
 
@@ -694,7 +680,7 @@ ustar_strd(void)
  */
 
 int
-ustar_stwr(void)
+ustar_stwr(int is_app __attribute__((__unused__)))
 {
 	if ((uidtb_start() < 0) || (gidtb_start() < 0))
 		return(-1);
@@ -788,11 +774,7 @@ ustar_rd(ARCHD *arcn, char *buf)
 	 */
 	arcn->sb.st_mode = (mode_t)(asc_ul(hd->mode, sizeof(hd->mode), OCT) &
 	    0xfff);
-#ifdef LONG_OFF_T
-	arcn->sb.st_size = (off_t)asc_ul(hd->size, sizeof(hd->size), OCT);
-#else
-	arcn->sb.st_size = (off_t)asc_uqd(hd->size, sizeof(hd->size), OCT);
-#endif
+	arcn->sb.st_size = (off_t)asc_ot(hd->size, sizeof(hd->size), OCT);
 	arcn->sb.st_mtime = (time_t)asc_ul(hd->mtime, sizeof(hd->mtime), OCT);
 	arcn->sb.st_ctime = arcn->sb.st_atime = arcn->sb.st_mtime;
 
@@ -803,10 +785,12 @@ ustar_rd(ARCHD *arcn, char *buf)
 	 * the posix spec wants).
 	 */
 	hd->gname[sizeof(hd->gname) - 1] = '\0';
-	if (gid_name(hd->gname, &(arcn->sb.st_gid)) < 0)
+	if ((anonarch & ANON_NUMID) ||
+	    (gid_name(hd->gname, &(arcn->sb.st_gid)) < 0))
 		arcn->sb.st_gid = (gid_t)asc_ul(hd->gid, sizeof(hd->gid), OCT);
 	hd->uname[sizeof(hd->uname) - 1] = '\0';
-	if (uid_name(hd->uname, &(arcn->sb.st_uid)) < 0)
+	if ((anonarch & ANON_NUMID) ||
+	    (uid_name(hd->uname, &(arcn->sb.st_uid)) < 0))
 		arcn->sb.st_uid = (uid_t)asc_ul(hd->uid, sizeof(hd->uid), OCT);
 
 	/*
@@ -922,7 +906,7 @@ ustar_wr(ARCHD *arcn)
 	 * check for those file system types ustar cannot store
 	 */
 	if (arcn->type == PAX_SCK) {
-		paxwarn(1, "Ustar cannot archive a socket %s", arcn->org_name);
+		paxwarn(1, "ustar cannot archive a socket %s", arcn->org_name);
 		return(1);
 	}
 
@@ -934,6 +918,15 @@ ustar_wr(ARCHD *arcn)
 	    ((size_t)arcn->ln_nlen > sizeof(hd->linkname))) {
 		paxwarn(1, "Link name too long for ustar %s", arcn->ln_name);
 		return(1);
+	}
+
+	/*
+	 * if -M gslash: append a slash if directory
+	 */
+	if ((anonarch & ANON_DIRSLASH) && arcn->type == PAX_DIR &&
+	    (size_t)arcn->nlen < (sizeof(arcn->name) - 1)) {
+		arcn->name[arcn->nlen++] = '/';
+		arcn->name[arcn->nlen] = '\0';
 	}
 
 	/*
@@ -1027,13 +1020,7 @@ ustar_wr(ARCHD *arcn)
 		else
 			hd->typeflag = REGTYPE;
 		arcn->pad = TAR_PAD(arcn->sb.st_size);
-#		ifdef LONG_OFF_T
-		if (ul_oct((u_long)arcn->sb.st_size, hd->size,
-		    sizeof(hd->size), 3)) {
-#		else
-		if (uqd_oct((u_quad_t)arcn->sb.st_size, hd->size,
-		    sizeof(hd->size), 3)) {
-#		endif
+		if (ot_oct(arcn->sb.st_size, hd->size, sizeof(hd->size), 3)) {
 			paxwarn(1,"File is too long for ustar %s",arcn->org_name);
 			return(1);
 		}
@@ -1055,7 +1042,7 @@ ustar_wr(ARCHD *arcn)
 		if (uid_warn != t_uid) {
 			uid_warn = t_uid;
 			paxwarn(1,
-			    "Ustar header field is too small for uid %lu, "
+			    "ustar header field is too small for uid %lu, "
 			    "using nobody", t_uid);
 		}
 		if (ul_oct((u_long)uid_nobody, hd->uid, sizeof(hd->uid), 3))
@@ -1069,7 +1056,7 @@ ustar_wr(ARCHD *arcn)
 		if (gid_warn != t_gid) {
 			gid_warn = t_gid;
 			paxwarn(1,
-			    "Ustar header field is too small for gid %lu, "
+			    "ustar header field is too small for gid %lu, "
 			    "using nobody", t_gid);
 		}
 		if (ul_oct((u_long)gid_nobody, hd->gid, sizeof(hd->gid), 3))
@@ -1078,8 +1065,10 @@ ustar_wr(ARCHD *arcn)
 	if (ul_oct((u_long)arcn->sb.st_mode, hd->mode, sizeof(hd->mode), 3) ||
 	    ul_oct(t_mtime,hd->mtime,sizeof(hd->mtime),3))
 		goto out;
-	strncpy(hd->uname, name_uid(t_uid, 0), sizeof(hd->uname));
-	strncpy(hd->gname, name_gid(t_gid, 0), sizeof(hd->gname));
+#define name_id(x) ((anonarch & ANON_NUMID) ? "" : (const char *)(x))
+	strncpy(hd->uname, name_id(name_uid(t_uid, 0)), sizeof(hd->uname));
+	strncpy(hd->gname, name_id(name_gid(t_gid, 0)), sizeof(hd->gname));
+#undef name_id
 
 	/*
 	 * calculate and store the checksum write the header to the archive
@@ -1119,11 +1108,11 @@ ustar_wr(ARCHD *arcn)
 		return(0);
 	return(1);
 
-    out:
+ out:
 	/*
 	 * header field is out of range
 	 */
-	paxwarn(1, "Ustar header field is too small for %s", arcn->org_name);
+	paxwarn(1, "ustar header field is too small for %s", arcn->org_name);
 	return(1);
 }
 
@@ -1175,7 +1164,7 @@ name_split(char *name, int len)
 	len = start - name;
 
 	/*
-	 * NOTE: /str where the length of str == TNMSZ can not be stored under
+	 * NOTE: /str where the length of str == TNMSZ cannot be stored under
 	 * the p1003.1-1990 spec for ustar. We could force a prefix of / and
 	 * the file would then expand on extract to //str. The len == 0 below
 	 * makes this special case follow the spec to the letter.
@@ -1217,7 +1206,7 @@ tar_dbgfld(const char *pfx, const char *sp, size_t len)
 			if (len == 0) {
 				*fbuf = 0;
 			} else {
-				paxwarn(0, fbuf);
+				paxwarn(0, "%s", fbuf);
 			}
 		} else
 			paxwarn(0, "tar_dbgfld: wrong call");

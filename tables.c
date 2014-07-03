@@ -1,8 +1,12 @@
-/*	$OpenBSD: tables.c,v 1.25 2007/09/02 15:19:08 deraadt Exp $	*/
+/*	$OpenBSD: tables.c,v 1.26 2009/10/27 23:59:22 deraadt Exp $	*/
 /*	$NetBSD: tables.c,v 1.4 1995/03/21 09:07:45 cgd Exp $	*/
 
 /*-
- * Copyright (c) 2005 Thorsten Glaser <tg@66h.42h.de>
+ * Copyright (c) 2005, 2012
+ *	Thorsten Glaser <tg@mirbsd.org>
+ * Copyright (c) 2011
+ *	Svante Signell <svante.signell@telia.com>
+ *	Guillem Jover <guillem@debian.org>
  * Copyright (c) 1992 Keith Muller.
  * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -44,12 +48,12 @@
 #include <unistd.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <time.h>
 #include "pax.h"
 #include "tables.h"
 #include "extern.h"
 
-__SCCSID("@(#)tables.c	8.1 (Berkeley) 5/31/93");
-__RCSID("$MirOS: src/bin/pax/tables.c,v 1.8 2007/10/23 20:07:42 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/tables.c,v 1.16 2012/06/05 18:22:57 tg Exp $");
 
 /*
  * Routines for controlling the contents of all the different databases pax
@@ -58,7 +62,7 @@ __RCSID("$MirOS: src/bin/pax/tables.c,v 1.8 2007/10/23 20:07:42 tg Exp $");
  * were kept simple, but do have complex rules for when the contents change.
  * As of this writing, the posix library functions were more complex than
  * needed for this application (pax databases have very short lifetimes and
- * do not survive after pax is finished). Pax is required to handle very
+ * do not survive after pax is finished). pax is required to handle very
  * large archives. These database routines carefully combine memory usage and
  * temporary file storage in ways which will not significantly impact runtime
  * performance while allowing the largest possible archives to be handled.
@@ -108,7 +112,7 @@ lnk_start(void)
 	if (ltab != NULL)
 		return(0);
  	if ((ltab = (HRDLNK **)calloc(L_TAB_SZ, sizeof(HRDLNK *))) == NULL) {
-		paxwarn(1, "Cannot allocate memory for hard link table");
+		paxwarn(1, "Cannot allocate memory for %s", "hard link table");
 		return(-1);
 	}
 	return(0);
@@ -204,7 +208,7 @@ chk_lnk(ARCHD *arcn)
 		(void)free((char *)pt);
 	}
 
-	paxwarn(1, "Hard link table out of memory");
+	paxwarn(1, "%s out of memory", "Hard link table");
 	return(-1);
 }
 
@@ -336,7 +340,7 @@ ftime_start(void)
 	if (ftab != NULL)
 		return(0);
  	if ((ftab = (FTM **)calloc(F_TAB_SZ, sizeof(FTM *))) == NULL) {
-		paxwarn(1, "Cannot allocate memory for file time table");
+		paxwarn(1, "Cannot allocate memory for %s", "file time table");
 		return(-1);
 	}
 
@@ -399,13 +403,13 @@ chk_ftime(ARCHD *arcn)
 				 * from the scratch file.
 				 */
 				if (lseek(ffd,pt->seek,SEEK_SET) != pt->seek) {
-					syswarn(1, errno,
-					    "Failed ftime table seek");
+					syswarn(1, errno, "Failed %s on %s",
+					    "seek", "file time table");
 					return(-1);
 				}
 				if (read(ffd, ckname, namelen) != namelen) {
-					syswarn(1, errno,
-					    "Failed ftime table read");
+					syswarn(1, errno, "Failed %s on %s",
+					    "read", "file time table");
 					return(-1);
 				}
 
@@ -456,11 +460,13 @@ chk_ftime(ARCHD *arcn)
 				ftab[indx] = pt;
 				return(0);
 			}
-			syswarn(1, errno, "Failed write to file time table");
+			syswarn(1, errno, "Failed %s on %s",
+			    "write", "file time table");
 		} else
-			syswarn(1, errno, "Failed seek on file time table");
+			syswarn(1, errno, "Failed %s on %s",
+			    "seek", "file time table");
 	} else
-		paxwarn(1, "File time table ran out of memory");
+		paxwarn(1, "%s out of memory", "File time table");
 
 	if (pt != NULL)
 		(void)free((char *)pt);
@@ -492,7 +498,7 @@ name_start(void)
 	if (ntab != NULL)
 		return(0);
  	if ((ntab = (NAMT **)calloc(N_TAB_SZ, sizeof(NAMT *))) == NULL) {
-		paxwarn(1, "Cannot allocate memory for interactive rename table");
+		paxwarn(1, "Cannot allocate memory for %s", "interactive rename table");
 		return(-1);
 	}
 	return(0);
@@ -564,7 +570,7 @@ add_name(char *oname, int onamelen, char *nname)
 		}
 		(void)free((char *)pt);
 	}
-	paxwarn(1, "Interactive rename table out of memory");
+	paxwarn(1, "%s out of memory", "Interactive rename table");
 	return(-1);
 }
 
@@ -666,7 +672,7 @@ dev_start(void)
 	if (dtab != NULL)
 		return(0);
  	if ((dtab = (DEVT **)calloc(D_TAB_SZ, sizeof(DEVT *))) == NULL) {
-		paxwarn(1, "Cannot allocate memory for device mapping table");
+		paxwarn(1, "Cannot allocate memory for %s", "device mapping table");
 		return(-1);
 	}
 	return(0);
@@ -739,7 +745,7 @@ chk_dev(dev_t dev, int add)
 	 * list must be NULL.
 	 */
 	if ((pt = (DEVT *)malloc(sizeof(DEVT))) == NULL) {
-		paxwarn(1, "Device map table out of memory");
+		paxwarn(1, "%s out of memory", "Device map table");
 		return(NULL);
 	}
 	pt->dev = dev;
@@ -872,7 +878,7 @@ map_dev(ARCHD *arcn, u_long dev_mask, u_long ino_mask)
 	arcn->sb.st_ino = nino;
 	return(0);
 
-    bad:
+ bad:
 	paxwarn(1, "Unable to fix truncated inode/device field when storing %s",
 	    arcn->name);
 	paxwarn(0, "Archive may create improper hard links when extracted");
@@ -1001,7 +1007,7 @@ add_atdir(char *fname, dev_t dev, ino_t ino, time_t mtime, time_t atime)
 		(void)free((char *)pt);
 	}
 
-	paxwarn(1, "Directory access time reset table ran out of memory");
+	paxwarn(1, "%s out of memory", "Directory access time reset table");
 	return;
 }
 
@@ -1064,7 +1070,7 @@ get_atdir(dev_t dev, ino_t ino, time_t *mtime, time_t *atime)
  * directory access mode and time storage routines (for directories CREATED
  * by pax).
  *
- * Pax requires that extracted directories, by default, have their access/mod
+ * pax requires that extracted directories, by default, have their access/mod
  * times and permissions set to the values specified in the archive. During the
  * actions of extracting (and creating the destination subtree during -rw copy)
  * directories extracted may be modified after being created. Even worse is
@@ -1122,14 +1128,23 @@ void
 add_dir(char *name, struct stat *psb, int frc_mode)
 {
 	DIRDATA *dblk;
+#if (_POSIX_VERSION >= 200809L)
+	char *rp = NULL;
+#else
 	char realname[MAXPATHLEN], *rp;
+#endif
 
 	if (dirp == NULL)
 		return;
 
 	if (havechd && *name != '/') {
-		if ((rp = realpath(name, realname)) == NULL) {
-			paxwarn(1, "Cannot canonicalize %s", name);
+#if (_POSIX_VERSION >= 200809L)
+		if ((rp = realpath(name, NULL)) == NULL)
+#else
+		if ((rp = realpath(name, realname)) == NULL)
+#endif
+		    {
+			paxwarn(1, "Cannot canonicalise %s", name);
 			return;
 		}
 		name = rp;
@@ -1139,6 +1154,9 @@ add_dir(char *name, struct stat *psb, int frc_mode)
 		if (dblk == NULL) {
 			paxwarn(1, "Unable to store mode and times for created"
 			    " directory: %s", name);
+#if (_POSIX_VERSION >= 200809L)
+			free(rp);
+#endif
 			return;
 		}
 		dirp = dblk;
@@ -1148,6 +1166,9 @@ add_dir(char *name, struct stat *psb, int frc_mode)
 	if ((dblk->name = strdup(name)) == NULL) {
 		paxwarn(1, "Unable to store mode and times for created"
 		    " directory: %s", name);
+#if (_POSIX_VERSION >= 200809L)
+		free(rp);
+#endif
 		return;
 	}
 	dblk->mode = psb->st_mode & 0xffff;
@@ -1155,6 +1176,9 @@ add_dir(char *name, struct stat *psb, int frc_mode)
 	dblk->atime = psb->st_atime;
 	dblk->frc_mode = frc_mode;
 	++dircnt;
+#if (_POSIX_VERSION >= 200809L)
+	free(rp);
+#endif
 }
 
 /*
@@ -1287,7 +1311,7 @@ flnk_start(void)
 	if (fltab != NULL)
 		return (0);
  	if ((fltab = (HRDFLNK **)calloc(L_TAB_SZ, sizeof(HRDFLNK *))) == NULL) {
-		paxwarn(1, "Cannot allocate memory for hard link table");
+		paxwarn(1, "Cannot allocate memory for %s", "hard link table");
 		return (-1);
 	}
 	return (0);
@@ -1369,6 +1393,6 @@ chk_flnk(ARCHD *arcn)
 		return (pt->newi);
 	}
 
-	paxwarn(1, "Hard link table out of memory");
+	paxwarn(1, "%s out of memory", "Hard link table");
 	return (-1);
 }

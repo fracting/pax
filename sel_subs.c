@@ -1,4 +1,4 @@
-/*	$OpenBSD: sel_subs.c,v 1.18 2004/04/16 22:50:23 deraadt Exp $	*/
+/*	$OpenBSD: sel_subs.c,v 1.20 2009/11/12 20:17:03 deraadt Exp $	*/
 /*	$NetBSD: sel_subs.c,v 1.5 1995/03/21 09:07:42 cgd Exp $	*/
 
 /*-
@@ -43,13 +43,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 #include "pax.h"
 #include "sel_subs.h"
 #include "extern.h"
 
-__SCCSID("@(#)sel_subs.c	8.1 (Berkeley) 5/31/93");
-__RCSID("$MirOS: src/bin/pax/sel_subs.c,v 1.3 2008/03/14 15:55:21 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/sel_subs.c,v 1.6 2012/06/05 18:22:57 tg Exp $");
 
 static int str_sec(const char *, time_t *);
 static int usr_match(ARCHD *);
@@ -386,6 +386,7 @@ trng_add(char *str)
 			default:
 				paxwarn(1, "Bad option %c with time range %s",
 				    *flgpt, str);
+				(void)free((char *)pt);
 				goto out;
 			}
 			++flgpt;
@@ -441,7 +442,7 @@ trng_add(char *str)
 	trtail = pt;
 	return(0);
 
-    out:
+ out:
 	paxwarn(1, "Time range format is: [[[[[cc]yy]mm]dd]HH]MM[.SS][/[c][m]]");
 	return(-1);
 }

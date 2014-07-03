@@ -1,8 +1,9 @@
-/**	$MirOS: src/bin/pax/pax.c,v 1.7 2007/02/17 04:52:41 tg Exp $ */
-/*	$OpenBSD: pax.c,v 1.28 2005/08/04 10:02:44 mpf Exp $	*/
+/*	$OpenBSD: pax.c,v 1.33 2012/04/19 04:26:46 deraadt Exp $	*/
 /*	$NetBSD: pax.c,v 1.5 1996/03/26 23:54:20 mrg Exp $	*/
 
 /*-
+ * Copyright (c) 2012
+ *	Thorsten Glaser <tg@mirbsd.org>
  * Copyright (c) 1992 Keith Muller.
  * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -48,16 +49,14 @@
 #include <err.h>
 #include <fcntl.h>
 #include <paths.h>
+#include <time.h>
 #include "pax.h"
 #include "extern.h"
 
-__COPYRIGHT("@(#) Copyright (c) 1992, 1993\n\
-	The Regents of the University of California.  All rights reserved.\n");
-__SCCSID("@(#)pax.c	8.2 (Berkeley) 4/18/94");
-__RCSID("$MirOS: src/bin/pax/pax.c,v 1.7 2007/02/17 04:52:41 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/pax.c,v 1.19 2012/06/05 18:22:57 tg Exp $");
 
 static int gen_init(void);
-static void sig_cleanup(int) __attribute__((noreturn));
+static void sig_cleanup(int) __attribute__((__noreturn__));
 
 /*
  * PAX main routines, general globals and some simple start up routines
@@ -77,6 +76,7 @@ int	lflag;			/* use hard links when possible */
 int	nflag;			/* select first archive member match */
 int	tflag;			/* restore access time after read */
 int	uflag;			/* ignore older modification time files */
+int	Vflag = 0;		/* print a dot for each file processed */
 int	vflag;			/* produce verbose output */
 int	Dflag;			/* same as uflag except inode change time */
 int	Hflag;			/* follow command line symlinks (write only) */
@@ -85,7 +85,7 @@ int	Xflag;			/* archive files with same device id only */
 int	Yflag;			/* same as Dflag except after name mode */
 int	Zflag;			/* same as uflag except after name mode */
 int	zeroflag;		/* use \0 as pathname terminator */
-int	vfpart;			/* is partial verbose output in progress */
+int	vfpart = 0;		/* is partial verbose output in progress */
 int	patime = 1;		/* preserve file access time */
 int	pmtime = 1;		/* preserve file modification times */
 int	nodirs;			/* do not create directories as needed */
@@ -228,6 +228,9 @@ main(int argc, char **argv)
 	const char *tmpdir;
 	size_t tdlen;
 
+	/* may not be a constant, thus initialising early */
+	listf = stderr;
+
 	/*
 	 * Keep a reference to cwd, so we can always come back home.
 	 */
@@ -255,8 +258,6 @@ main(int argc, char **argv)
 	tempbase = tempfile + tdlen;
 	*tempbase++ = '/';
 
-	listf = stderr;
-
 	/*
 	 * parse options, determine operational mode, general init
 	 */
@@ -275,15 +276,16 @@ main(int argc, char **argv)
 		archive();
 		break;
 	case APPND:
-		if (gzip_program != NULL)
-			errx(1, "can not gzip while appending");
+		if (compress_program != NULL)
+			errx(1, "cannot compress while appending");
 		append();
 		break;
 	case COPY:
 		copy();
 		break;
 	default:
-		act = LIST;	/* for ar_io.c &c. */
+		/* for ar_io.c etc. */
+		act = LIST;
 	case LIST:
 		list();
 		break;
@@ -303,7 +305,14 @@ main(int argc, char **argv)
 static void
 sig_cleanup(int which_sig)
 {
-	/* XXX signal races */
+	/*
+	 * The definition of this array doubles as compile-time assert
+	 * on the size of long, off_t, and whether LONG_OFF_T is used,
+	 * or not, correctly; target size is 80, error size -1.
+	 */
+	char errbuf[((sizeof(long) >= 4) &&
+	    (sizeof(ot_type) >= 4) &&
+	    (sizeof(ot_type) == sizeof(off_t))) ? 80 : -1];
 
 	/*
 	 * restore modes and times for any dirs we may have created
@@ -311,16 +320,24 @@ sig_cleanup(int which_sig)
 	 * will clearly see the message on a line by itself.
 	 */
 	vflag = vfpart = 1;
-	if (which_sig == SIGXCPU)
-		paxwarn(0, "Cpu time limit reached, cleaning up.");
-	else
-		paxwarn(0, "Signal caught, cleaning up.");
 
-	ar_close();
-	proc_dir();
+	/* paxwarn() uses stdio; fake it as well as we can */
+	if (which_sig == SIGXCPU)
+		strlcpy(errbuf, "CPU time limit reached, cleaning up.\n",
+		    sizeof errbuf);
+	else
+		strlcpy(errbuf, "Signal caught, cleaning up.\n",
+		    sizeof errbuf);
+	if (!write(STDERR_FILENO, errbuf, strlen(errbuf))) {
+		/* dummy, to keep fortified gcc quiet */
+		errbuf[0] = '\0';
+	}
+
+	ar_close();			/* XXX signal race */
+	proc_dir();			/* XXX signal race */
 	if (tflag)
-		atdir_end();
-	exit(1);
+		atdir_end();		/* XXX signal race */
+	_exit(1);
 }
 
 /*
@@ -382,7 +399,7 @@ gen_init(void)
 	/*
 	 * signal handling to reset stored directory times and modes. Since
 	 * we deal with broken pipes via failed writes we ignore it. We also
-	 * deal with any file size limit through failed writes. Cpu time
+	 * deal with any file size limit through failed writes. CPU time
 	 * limits are caught and a cleanup is forced.
 	 */
 	if ((sigemptyset(&s_mask) < 0) || (sigaddset(&s_mask, SIGTERM) < 0) ||
@@ -397,29 +414,29 @@ gen_init(void)
 	n_hand.sa_flags = 0;
 	n_hand.sa_handler = sig_cleanup;
 
-	if ((sigaction(SIGHUP, &n_hand, &o_hand) < 0) &&
+	if ((sigaction(SIGHUP, &n_hand, &o_hand) < 0) || (
 	    (o_hand.sa_handler == SIG_IGN) &&
-	    (sigaction(SIGHUP, &o_hand, &o_hand) < 0))
+	    (sigaction(SIGHUP, &o_hand, &o_hand) < 0)))
 		goto out;
 
-	if ((sigaction(SIGTERM, &n_hand, &o_hand) < 0) &&
+	if ((sigaction(SIGTERM, &n_hand, &o_hand) < 0) || (
 	    (o_hand.sa_handler == SIG_IGN) &&
-	    (sigaction(SIGTERM, &o_hand, &o_hand) < 0))
+	    (sigaction(SIGTERM, &o_hand, &o_hand) < 0)))
 		goto out;
 
-	if ((sigaction(SIGINT, &n_hand, &o_hand) < 0) &&
+	if ((sigaction(SIGINT, &n_hand, &o_hand) < 0) || (
 	    (o_hand.sa_handler == SIG_IGN) &&
-	    (sigaction(SIGINT, &o_hand, &o_hand) < 0))
+	    (sigaction(SIGINT, &o_hand, &o_hand) < 0)))
 		goto out;
 
-	if ((sigaction(SIGQUIT, &n_hand, &o_hand) < 0) &&
+	if ((sigaction(SIGQUIT, &n_hand, &o_hand) < 0) || (
 	    (o_hand.sa_handler == SIG_IGN) &&
-	    (sigaction(SIGQUIT, &o_hand, &o_hand) < 0))
+	    (sigaction(SIGQUIT, &o_hand, &o_hand) < 0)))
 		goto out;
 
-	if ((sigaction(SIGXCPU, &n_hand, &o_hand) < 0) &&
+	if ((sigaction(SIGXCPU, &n_hand, &o_hand) < 0) || (
 	    (o_hand.sa_handler == SIG_IGN) &&
-	    (sigaction(SIGXCPU, &o_hand, &o_hand) < 0))
+	    (sigaction(SIGXCPU, &o_hand, &o_hand) < 0)))
 		goto out;
 
 	n_hand.sa_handler = SIG_IGN;
@@ -428,7 +445,7 @@ gen_init(void)
 		goto out;
 	return(0);
 
-    out:
+ out:
 	syswarn(1, errno, "Unable to set up signal handler");
 	return(-1);
 }
