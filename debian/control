@@ -1,7 +1,7 @@
 Source: pax
 Section: utils
 Priority: optional
-Maintainer: Thorsten Glaser <tg@mirbsd.de>
+Maintainer: Debian QA Group <packages@qa.debian.org>
 Standards-Version: 3.9.6
 Build-Depends: debhelper (>= 5)
 VCS-git: git://anonscm.debian.org/collab-maint/pax.git

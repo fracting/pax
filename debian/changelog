@@ -1,3 +1,12 @@
+pax (1:20140703-2) unstable; urgency=low
+
+  * QA upload.
+  * Revert to a more standard Debian packaging style
+  * Bump to Policy 3.9.6 while here
+  * Orphan the package.
+
+ -- Thorsten Glaser <tg@mirbsd.de>  Tue, 07 Oct 2014 18:09:21 +0000
+
 pax (1:20140703-1) unstable; urgency=medium
 
   * Merge 1:20120606-2+deb7u1 upload
