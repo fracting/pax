@@ -31,14 +31,25 @@ build: build-arch build-indep
 build-arch: debian/.build_stamp
 build-indep:
 
+SRCS=	ar.c ar_io.c ar_subs.c buf_subs.c cache.c cpio.c file_subs.c ftree.c gen_subs.c getoldopt.c options.c pat_rep.c pax.c sel_subs.c tables.c tar.c tty_subs.c
+OBJS=	ar.o ar_io.o ar_subs.o buf_subs.o cache.o cpio.o file_subs.o ftree.o gen_subs.o getoldopt.o options.o pat_rep.o pax.o sel_subs.o tables.o tar.o tty_subs.o
+
 debian/.build_stamp:
 	dh_testdir
 	+for opts in '-flto=jobserver' '-fwhole-program --combine' ''; do \
+		rm -f *.o; \
+		num=0; \
 		set -x; \
-		${CC} ${CPPFLAGS} ${CFLAGS} $$opts ${LDFLAGS} -o pax ar.c \
-		    ar_io.c ar_subs.c buf_subs.c cache.c cpio.c file_subs.c \
-		    ftree.c gen_subs.c getoldopt.c options.c pat_rep.c pax.c \
-		    sel_subs.c tables.c tar.c tty_subs.c; \
+		case $$opts in \
+		(*combine*) ${CC} ${CPPFLAGS} ${CFLAGS} $$opts ${LDFLAGS} \
+		    -frandom-seed=42 -o pax ${SRCS} ;; \
+		(*) for srcf in ${SRCS}; do \
+			objf=$${srcf%.c}.o; \
+			${CC} ${CPPFLAGS} ${CFLAGS} $$opts -frandom-seed=$$num \
+			    -c -o $$objf $$srcf || break; \
+			num=$$(($$num + 1)); \
+		    done; ${CC} ${CFLAGS} $$opts ${LDFLAGS} -o pax ${OBJS} ;; \
+		esac; \
 		test -x pax && exit 0; \
 	done; echo >&2 Compiling failed.; exit 1
 	echo .nr g 2 | cat - cpio.1 >debian/paxcpio.1
@@ -49,7 +60,7 @@ debian/.build_stamp:
 clean:
 	dh_testdir
 	dh_clean
-	-rm -f debian/.*_stamp \
+	-rm -f debian/.*_stamp *.o \
 	    debian/paxcpio.1 debian/pax.1 debian/paxtar.1 pax
 
 binary-indep: build-indep

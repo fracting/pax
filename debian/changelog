@@ -1,3 +1,10 @@
+pax (1:20140703-3) unstable; urgency=low
+
+  * Build file-by-file for reproducible builds effort
+  * Add -frandom-seed to GCC invocations for the same
+
+ -- Thorsten Glaser <tg@mirbsd.de>  Thu, 15 Jan 2015 18:17:01 +0100
+
 pax (1:20140703-2) unstable; urgency=low
 
   * QA upload.
