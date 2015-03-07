@@ -49,7 +49,9 @@ debian/.build_stamp:
 			${CC} ${CPPFLAGS} ${CFLAGS} $$opts -frandom-seed=$$num \
 			    -c -o $$objf $$srcf || break; \
 			num=$$(($$num + 1)); \
-		    done; ${CC} ${CFLAGS} $$opts ${LDFLAGS} -o pax ${OBJS} ;; \
+		    done; \
+		    ${CC} ${CFLAGS} $$opts -frandom-seed=$$num \
+		    ${LDFLAGS} -o pax ${OBJS} ;; \
 		esac; \
 		test -x pax && exit 0; \
 	done; echo >&2 Compiling failed.; exit 1
