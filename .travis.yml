@@ -32,5 +32,4 @@ script:
   - cp ${srcdir}/PKGBUILD ~
   - cp ${srcdir}/*.install ~
   - msys2-prepare
-  - msys2-wrapper "ls nonexistent" # trigger failure on purpose
   - msys2-wrapper "makepkg -s --noconfirm --noprogressbar --noextract --skippgpcheck -f"
